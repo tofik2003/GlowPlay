@@ -29,6 +29,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -100,6 +101,10 @@ class PlayerViewModel(
             refreshTracks(tracks)
         }
 
+        override fun onAudioSessionIdChanged(audioSessionId: Int) {
+            if (audioSessionId != C.AUDIO_SESSION_ID_UNSET) attachEqualizer(audioSessionId)
+        }
+
         override fun onPlayerError(error: PlaybackException) {
             _state.update { it.copy(error = error.message ?: "Playback error", buffering = false) }
         }
@@ -110,13 +115,7 @@ class PlayerViewModel(
         player.addListener(listener)
         viewModelScope.launch {
             prefs.flow.collect { preferences ->
-                _state.update {
-                    it.copy(
-                        preferences = preferences,
-                        preset = if (it.preset == EnhancePreset.OFF) preferences.defaultPreset else it.preset,
-                    )
-                }
-                applyEnhance(_state.value.enhance, _state.value.preset)
+                _state.update { it.copy(preferences = preferences) }
             }
         }
         progressJob = viewModelScope.launch {
@@ -140,14 +139,15 @@ class PlayerViewModel(
         playlistUris: List<String>,
         startIndex: Int,
     ) {
-        mediaKey = key.ifBlank { uri.toString() }
+        val resolvedKey = key.ifBlank { uri.toString() }
+        mediaKey = resolvedKey
         playlist = playlistUris.ifEmpty { listOf(uri.toString()) }
         val items = playlist.map { MediaItem.fromUri(it) }
         val index = startIndex.coerceIn(0, (items.size - 1).coerceAtLeast(0))
         player.setMediaItems(items, index, C.TIME_UNSET)
         viewModelScope.launch {
-            val preferences = _state.value.preferences
-            val resume = if (preferences.rememberPosition) playbackStore.get(mediaKey) else 0L
+            val preferences = prefs.flow.first()
+            val resume = if (preferences.rememberPosition) playbackStore.get(resolvedKey) else 0L
             if (resume > 1_000L) player.seekTo(resume)
             val preset = preferences.defaultPreset
             val enhance = preset.settingsOr(preferences.customEnhance)
@@ -299,20 +299,19 @@ class PlayerViewModel(
         )
     }
 
-    fun persistAndRelease(releasePlayer: Boolean) {
+    fun persist() {
         viewModelScope.launch {
             persistPosition(forceClear = false)
-            if (releasePlayer) {
-                equalizer?.release()
-                equalizer = null
-                player.removeListener(listener)
-                PlayerHolder.release()
-            }
         }
     }
 
     override fun onCleared() {
-        persistAndRelease(releasePlayer = false)
+        progressJob?.cancel()
+        hideJob?.cancel()
+        enhanceJob?.cancel()
+        runCatching { player.removeListener(listener) }
+        runCatching { equalizer?.release() }
+        equalizer = null
         super.onCleared()
     }
 
@@ -333,10 +332,11 @@ class PlayerViewModel(
         }
     }
 
-    private fun attachEqualizer() {
+    private fun attachEqualizer(audioSessionId: Int = player.audioSessionId) {
+        if (audioSessionId == C.AUDIO_SESSION_ID_UNSET) return
         runCatching {
             equalizer?.release()
-            equalizer = Equalizer(0, player.audioSessionId).apply { enabled = true }
+            equalizer = Equalizer(0, audioSessionId).apply { enabled = true }
         }
     }
 

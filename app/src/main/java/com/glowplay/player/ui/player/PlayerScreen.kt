@@ -68,6 +68,7 @@ import com.glowplay.player.R
 import com.glowplay.player.data.model.EnhanceSettings
 import com.glowplay.player.enhance.EnhancePreset
 import com.glowplay.player.ui.components.AmbientFrame
+import com.glowplay.player.ui.components.enhancePresetLabel
 import com.glowplay.player.ui.theme.GlowCyan
 import com.glowplay.player.ui.theme.GlowMagenta
 import com.glowplay.player.ui.theme.Night
@@ -415,7 +416,7 @@ private fun EnhancePanel(
                 FilterChip(
                     selected = state.preset == preset,
                     onClick = { onPreset(preset) },
-                    label = { Text(presetLabel(preset)) },
+                    label = { Text(enhancePresetLabel(preset)) },
                 )
             }
         }
@@ -490,19 +491,6 @@ private fun EqChip(label: String, onClick: () -> Unit) {
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 8.dp),
     )
-}
-
-@Composable
-private fun presetLabel(preset: EnhancePreset): String = when (preset) {
-    EnhancePreset.OFF -> stringResource(R.string.preset_off)
-    EnhancePreset.GLOW -> stringResource(R.string.preset_glow)
-    EnhancePreset.CINEMA -> stringResource(R.string.preset_cinema)
-    EnhancePreset.VIVID -> stringResource(R.string.preset_vivid)
-    EnhancePreset.NIGHT -> stringResource(R.string.preset_night)
-    EnhancePreset.CRYSTAL -> stringResource(R.string.preset_crystal)
-    EnhancePreset.WARM -> stringResource(R.string.preset_warm)
-    EnhancePreset.COOL -> stringResource(R.string.preset_cool)
-    EnhancePreset.CUSTOM -> stringResource(R.string.preset_custom)
 }
 
 fun rotateActivity(activity: Activity) {

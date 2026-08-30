@@ -90,7 +90,7 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        playerViewModel.persistAndRelease(releasePlayer = false)
+        playerViewModel.persist()
         if (!inPip && !isChangingConfigurations) {
             playerViewModel.player.pause()
         }

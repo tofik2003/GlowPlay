@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -104,6 +105,7 @@ fun LibraryScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Night)
+                    .statusBarsPadding()
                     .padding(horizontal = 20.dp, vertical = 12.dp),
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -165,10 +167,12 @@ fun LibraryScreen(
                 containerColor = Night,
                 contentColor = GlowCyan,
                 indicator = { positions ->
-                    TabRowDefaults.SecondaryIndicator(
-                        modifier = Modifier.tabIndicatorOffset(positions[tab]),
-                        color = GlowCyan,
-                    )
+                    if (positions.size > tab) {
+                        TabRowDefaults.SecondaryIndicator(
+                            modifier = Modifier.tabIndicatorOffset(positions[tab]),
+                            color = GlowCyan,
+                        )
+                    }
                 },
             ) {
                 listOf(
@@ -425,16 +429,17 @@ fun FolderDetailScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Night),
+            .background(Night)
+            .statusBarsPadding(),
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            TextButton(onClick = onBack) { Text("Back", color = GlowCyan) }
+            TextButton(onClick = onBack) { Text(stringResource(R.string.back), color = GlowCyan) }
             Column {
                 GlowTitle(folder.name)
-                Text("${items.size} videos", color = TextSecondary)
+                Text(stringResource(R.string.videos_count, items.size), color = TextSecondary)
             }
         }
         VideoGrid(items, LibraryUiState(videos = items), onOpenVideo)

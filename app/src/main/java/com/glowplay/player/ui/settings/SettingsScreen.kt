@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FilterChip
@@ -23,6 +24,7 @@ import com.glowplay.player.R
 import com.glowplay.player.data.local.AppPreferences
 import com.glowplay.player.enhance.EnhancePreset
 import com.glowplay.player.ui.components.GlowTitle
+import com.glowplay.player.ui.components.enhancePresetLabel
 import com.glowplay.player.ui.theme.GlowCyan
 import com.glowplay.player.ui.theme.Night
 import com.glowplay.player.ui.theme.TextSecondary
@@ -44,9 +46,10 @@ fun SettingsScreen(
             .fillMaxSize()
             .background(Night)
             .verticalScroll(rememberScrollState())
+            .statusBarsPadding()
             .padding(20.dp),
     ) {
-        TextButton(onClick = onBack) { Text("Back", color = GlowCyan) }
+        TextButton(onClick = onBack) { Text(stringResource(R.string.back), color = GlowCyan) }
         GlowTitle(stringResource(R.string.settings))
         Section(stringResource(R.string.settings_playback))
         ToggleRow(stringResource(R.string.remember_position), state.rememberPosition, onRemember)
@@ -63,7 +66,7 @@ fun SettingsScreen(
                 FilterChip(
                     selected = state.defaultPreset == preset,
                     onClick = { onPreset(preset) },
-                    label = { Text(preset.name) },
+                    label = { Text(enhancePresetLabel(preset)) },
                     modifier = Modifier.padding(end = 8.dp),
                 )
             }

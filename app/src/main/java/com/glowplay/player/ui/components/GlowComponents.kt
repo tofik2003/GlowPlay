@@ -27,8 +27,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.glowplay.player.R
+import com.glowplay.player.enhance.EnhancePreset
 import com.glowplay.player.ui.theme.GlowCyan
 import com.glowplay.player.ui.theme.GlowMagenta
 import com.glowplay.player.ui.theme.NightCard
@@ -108,6 +111,19 @@ fun AmbientFrame(
         contentAlignment = Alignment.Center,
         content = content,
     )
+}
+
+@Composable
+fun enhancePresetLabel(preset: EnhancePreset): String = when (preset) {
+    EnhancePreset.OFF -> stringResource(R.string.preset_off)
+    EnhancePreset.GLOW -> stringResource(R.string.preset_glow)
+    EnhancePreset.CINEMA -> stringResource(R.string.preset_cinema)
+    EnhancePreset.VIVID -> stringResource(R.string.preset_vivid)
+    EnhancePreset.NIGHT -> stringResource(R.string.preset_night)
+    EnhancePreset.CRYSTAL -> stringResource(R.string.preset_crystal)
+    EnhancePreset.WARM -> stringResource(R.string.preset_warm)
+    EnhancePreset.COOL -> stringResource(R.string.preset_cool)
+    EnhancePreset.CUSTOM -> stringResource(R.string.preset_custom)
 }
 
 @Composable

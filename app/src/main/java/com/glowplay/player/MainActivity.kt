@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.glowplay.player.ui.navigation.GlowPlayNav
 import com.glowplay.player.ui.theme.GlowPlayTheme
@@ -20,14 +19,14 @@ class MainActivity : AppCompatActivity() {
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
     ) { result ->
-        granted = result.values.any { it } || hasMediaPermission()
+        granted = result.values.any { it } || MediaPermissions.granted(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        granted = hasMediaPermission()
+        granted = MediaPermissions.granted(this)
         setContent {
             GlowPlayTheme {
                 GlowPlayNav(
@@ -45,12 +44,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        granted = hasMediaPermission()
-    }
-
-    private fun hasMediaPermission(): Boolean {
-        return MediaPermissions.required().any { permission ->
-            ContextCompat.checkSelfPermission(this, permission) == android.content.pm.PackageManager.PERMISSION_GRANTED
-        }
+        granted = MediaPermissions.granted(this)
     }
 }
