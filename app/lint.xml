@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="UnusedResources" severity="ignore" />
+    <issue id="ContentDescription" severity="warning" />
+    <issue id="MissingTranslation" severity="ignore" />
+    <issue id="GradleDependency" severity="ignore" />
+    <issue id="OldTargetApi" severity="ignore" />
+    <issue id="UseAppTint" severity="ignore" />
+    <issue id="UnusedAttribute" severity="warning" />
+    <issue id="MissingDefaultResource" severity="ignore" />
+    <issue id="IconDensities" severity="ignore" />
+    <issue id="IconDuplicates" severity="ignore" />
+</lint>

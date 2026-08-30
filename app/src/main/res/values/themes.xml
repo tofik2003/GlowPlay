@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.GlowPlay" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:statusBarColor">@color/night</item>
+        <item name="android:navigationBarColor">@color/night</item>
+        <item name="android:windowBackground">@color/night</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="colorPrimary">@color/glow_cyan</item>
+        <item name="android:colorAccent">@color/glow_cyan</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+
+    <style name="Theme.GlowPlay.Player" parent="Theme.GlowPlay">
+        <item name="android:windowBackground">@color/night</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    </style>
+
+    <style name="Theme.GlowPlay.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/night</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_mark</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/night</item>
+        <item name="postSplashScreenTheme">@style/Theme.GlowPlay</item>
+        <item name="android:statusBarColor">@color/night</item>
+        <item name="android:navigationBarColor">@color/night</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>
