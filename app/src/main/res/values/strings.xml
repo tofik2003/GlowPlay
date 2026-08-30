@@ -17,7 +17,10 @@
     <string name="open_settings">Open settings</string>
     <string name="empty_library">No videos found on this device.</string>
     <string name="empty_recent">Nothing to continue yet. Play a video and GlowPlay will remember it.</string>
-    <string name="videos_count">%d videos</string>
+    <plurals name="videos_count">
+        <item quantity="one">%d video</item>
+        <item quantity="other">%d videos</item>
+    </plurals>
     <string name="unknown_folder">Internal storage</string>
 
     <string name="play">Play</string>

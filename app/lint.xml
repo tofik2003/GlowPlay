@@ -10,4 +10,10 @@
     <issue id="MissingDefaultResource" severity="ignore" />
     <issue id="IconDensities" severity="ignore" />
     <issue id="IconDuplicates" severity="ignore" />
+
+    <!-- Media3's UnstableApi is opted into project-wide via -opt-in in
+         build.gradle.kts; mirror that here so lint's opt-in check agrees. -->
+    <issue id="UnsafeOptInUsageError">
+        <option name="opt-in" value="androidx.media3.common.util.UnstableApi" />
+    </issue>
 </lint>

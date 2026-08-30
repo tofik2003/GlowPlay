@@ -26,11 +26,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Sort
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.Sort
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -60,6 +60,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -115,7 +116,7 @@ fun LibraryScreen(
                     }
                     Box {
                         IconButton(onClick = { sortMenu = true }) {
-                            Icon(Icons.Outlined.Sort, contentDescription = stringResource(R.string.sort), tint = GlowCyan)
+                            Icon(Icons.AutoMirrored.Outlined.Sort, contentDescription = stringResource(R.string.sort), tint = GlowCyan)
                         }
                         DropdownMenu(expanded = sortMenu, onDismissRequest = { sortMenu = false }) {
                             VideoSort.entries.forEach { option ->
@@ -439,7 +440,7 @@ fun FolderDetailScreen(
             TextButton(onClick = onBack) { Text(stringResource(R.string.back), color = GlowCyan) }
             Column {
                 GlowTitle(folder.name)
-                Text(stringResource(R.string.videos_count, items.size), color = TextSecondary)
+                Text(pluralStringResource(R.plurals.videos_count, items.size, items.size), color = TextSecondary)
             }
         }
         VideoGrid(items, LibraryUiState(videos = items), onOpenVideo)

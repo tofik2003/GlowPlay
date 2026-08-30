@@ -5,7 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.Rect
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Rational
 import androidx.activity.compose.setContent
@@ -110,10 +112,15 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun enterPip() {
         if (!packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) return
-        val params = PictureInPictureParams.Builder()
+        val sourceRect = Rect()
+        window.decorView.getGlobalVisibleRect(sourceRect)
+        val builder = PictureInPictureParams.Builder()
             .setAspectRatio(Rational(16, 9))
-            .build()
-        enterPictureInPictureMode(params)
+            .setSourceRectHint(sourceRect)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            builder.setAutoEnterEnabled(true)
+        }
+        enterPictureInPictureMode(builder.build())
     }
 
     companion object {
