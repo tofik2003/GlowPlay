@@ -48,8 +48,8 @@ class VideoRepository(context: Context) {
             MediaStore.Video.Media.WIDTH,
             MediaStore.Video.Media.HEIGHT,
             MediaStore.Video.Media.DATE_ADDED,
-            MediaStore.Video.Media.BUCKET_ID,
-            MediaStore.Video.Media.BUCKET_DISPLAY_NAME,
+            COLUMN_BUCKET_ID,
+            COLUMN_BUCKET_DISPLAY_NAME,
         )
         val sort = "${MediaStore.Video.Media.DATE_ADDED} DESC"
         try {
@@ -67,8 +67,8 @@ class VideoRepository(context: Context) {
                 val wCol = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.WIDTH)
                 val hCol = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.HEIGHT)
                 val dateCol = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED)
-                val bucketIdCol = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_ID)
-                val bucketNameCol = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME)
+                val bucketIdCol = cursor.getColumnIndex(COLUMN_BUCKET_ID)
+                val bucketNameCol = cursor.getColumnIndex(COLUMN_BUCKET_DISPLAY_NAME)
                 while (cursor.moveToNext()) {
                     val id = cursor.getLong(idCol)
                     val uri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
@@ -81,8 +81,8 @@ class VideoRepository(context: Context) {
                         width = cursor.getInt(wCol).coerceAtLeast(0),
                         height = cursor.getInt(hCol).coerceAtLeast(0),
                         dateAddedEpochSec = cursor.getLong(dateCol),
-                        folderId = cursor.getLong(bucketIdCol),
-                        folderName = cursor.getString(bucketNameCol).orEmpty(),
+                        folderId = if (bucketIdCol >= 0) cursor.getLong(bucketIdCol) else 0L,
+                        folderName = if (bucketNameCol >= 0) cursor.getString(bucketNameCol).orEmpty() else "",
                     )
                 }
             }
@@ -93,4 +93,12 @@ class VideoRepository(context: Context) {
     }
 
     fun parseUri(value: String): Uri = Uri.parse(value)
+
+    companion object {
+        // The public BUCKET_ID / BUCKET_DISPLAY_NAME constants were only added to
+        // MediaStore.MediaColumns in API 29, but the underlying provider columns have
+        // existed for far longer. Referencing the raw names keeps minSdk 26 working.
+        private const val COLUMN_BUCKET_ID = "bucket_id"
+        private const val COLUMN_BUCKET_DISPLAY_NAME = "bucket_display_name"
+    }
 }
