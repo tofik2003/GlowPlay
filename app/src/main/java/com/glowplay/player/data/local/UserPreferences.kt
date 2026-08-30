@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.glowplay.player.data.model.EnhanceSettings
@@ -24,6 +25,9 @@ data class AppPreferences(
     val defaultPreset: EnhancePreset = EnhancePreset.GLOW,
     val sort: VideoSort = VideoSort.DATE_NEW,
     val customEnhance: EnhanceSettings = EnhanceSettings(enabled = true),
+    val loudness: Int = 0,
+    val bassBoost: Int = 0,
+    val surround: Int = 0,
 )
 
 class UserPreferences(context: Context) {
@@ -37,6 +41,10 @@ class UserPreferences(context: Context) {
     suspend fun setLongPressSpeed(value: Boolean) = set(Keys.holdSpeed, value)
     suspend fun setHardwareDecoder(value: Boolean) = set(Keys.hw, value)
     suspend fun setPipOnLeave(value: Boolean) = set(Keys.pip, value)
+
+    suspend fun setLoudness(value: Int) = setInt(Keys.loudness, value)
+    suspend fun setBass(value: Int) = setInt(Keys.bass, value)
+    suspend fun setSurround(value: Int) = setInt(Keys.surround, value)
 
     suspend fun setPreset(preset: EnhancePreset) {
         dataStore.edit { it[Keys.preset] = preset.storageKey }
@@ -60,6 +68,10 @@ class UserPreferences(context: Context) {
     }
 
     private suspend fun set(key: Preferences.Key<Boolean>, value: Boolean) {
+        dataStore.edit { it[key] = value }
+    }
+
+    private suspend fun setInt(key: Preferences.Key<Int>, value: Int) {
         dataStore.edit { it[key] = value }
     }
 
@@ -89,6 +101,9 @@ class UserPreferences(context: Context) {
             defaultPreset = EnhancePreset.fromKey(this[Keys.preset]),
             sort = sort,
             customEnhance = custom,
+            loudness = (this[Keys.loudness] ?: 0).coerceIn(0, 2000),
+            bassBoost = (this[Keys.bass] ?: 0).coerceIn(0, 1000),
+            surround = (this[Keys.surround] ?: 0).coerceIn(0, 1000),
         )
     }
 
@@ -102,5 +117,8 @@ class UserPreferences(context: Context) {
         val preset = stringPreferencesKey("preset")
         val sort = stringPreferencesKey("sort")
         val custom = stringPreferencesKey("custom_enhance")
+        val loudness = intPreferencesKey("audio_loudness")
+        val bass = intPreferencesKey("audio_bass")
+        val surround = intPreferencesKey("audio_surround")
     }
 }

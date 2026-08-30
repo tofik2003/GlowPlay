@@ -83,6 +83,12 @@
     <string name="eq_treble">Treble</string>
     <string name="eq_vocal">Voice</string>
     <string name="eq_movie">Movie</string>
+    <string name="eq_dialogue">Dialogue</string>
+    <string name="eq_noise_reduce">Noise reducer</string>
+
+    <string name="audio_loudness">Loudness</string>
+    <string name="audio_bass">Bass</string>
+    <string name="audio_surround">Surround</string>
 
     <string name="notification_channel">Now playing</string>
     <string name="playback_channel_desc">GlowPlay media playback controls</string>

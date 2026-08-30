@@ -62,6 +62,9 @@ class PlayerActivity : AppCompatActivity() {
                     onEnhanceOpen = playerViewModel::setEnhanceOpen,
                     onEqOpen = playerViewModel::setEqOpen,
                     onEqPreset = playerViewModel::applyEqPreset,
+                    onLoudness = playerViewModel::setLoudness,
+                    onBass = playerViewModel::setBass,
+                    onSurround = playerViewModel::setSurround,
                     onPip = { enterPip() },
                     onRotate = { rotateActivity(this) },
                 )

@@ -67,6 +67,7 @@ import androidx.media3.ui.PlayerView
 import com.glowplay.player.R
 import com.glowplay.player.data.model.EnhanceSettings
 import com.glowplay.player.enhance.EnhancePreset
+import com.glowplay.player.playback.EqKind
 import com.glowplay.player.ui.components.AmbientFrame
 import com.glowplay.player.ui.components.enhancePresetLabel
 import com.glowplay.player.ui.theme.GlowCyan
@@ -76,6 +77,7 @@ import com.glowplay.player.ui.theme.TextPrimary
 import com.glowplay.player.ui.theme.TextSecondary
 import com.glowplay.player.util.TimeFormatter
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,7 +100,10 @@ fun PlayerScreen(
     onEnhance: ((EnhanceSettings) -> EnhanceSettings) -> Unit,
     onEnhanceOpen: (Boolean) -> Unit,
     onEqOpen: (Boolean) -> Unit,
-    onEqPreset: (PlayerViewModel.EqKind) -> Unit,
+    onEqPreset: (EqKind) -> Unit,
+    onLoudness: (Int) -> Unit,
+    onBass: (Int) -> Unit,
+    onSurround: (Int) -> Unit,
     onPip: () -> Unit,
     onRotate: () -> Unit,
 ) {
@@ -364,7 +369,13 @@ fun PlayerScreen(
             }
             if (state.eqOpen && !state.locked) {
                 EqPanel(
+                    loudness = state.loudness,
+                    bass = state.bass,
+                    surround = state.surround,
                     onEqPreset = onEqPreset,
+                    onLoudness = onLoudness,
+                    onBass = onBass,
+                    onSurround = onSurround,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .navigationBarsPadding(),
@@ -454,7 +465,13 @@ private fun EnhanceSlider(label: String, value: Float, onChange: (Float) -> Unit
 
 @Composable
 private fun EqPanel(
-    onEqPreset: (PlayerViewModel.EqKind) -> Unit,
+    loudness: Int,
+    bass: Int,
+    surround: Int,
+    onEqPreset: (EqKind) -> Unit,
+    onLoudness: (Int) -> Unit,
+    onBass: (Int) -> Unit,
+    onSurround: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -471,12 +488,31 @@ private fun EqPanel(
                 .padding(top = 10.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            EqChip(stringResource(R.string.eq_normal)) { onEqPreset(PlayerViewModel.EqKind.FLAT) }
-            EqChip(stringResource(R.string.eq_bass)) { onEqPreset(PlayerViewModel.EqKind.BASS) }
-            EqChip(stringResource(R.string.eq_treble)) { onEqPreset(PlayerViewModel.EqKind.TREBLE) }
-            EqChip(stringResource(R.string.eq_vocal)) { onEqPreset(PlayerViewModel.EqKind.VOICE) }
-            EqChip(stringResource(R.string.eq_movie)) { onEqPreset(PlayerViewModel.EqKind.MOVIE) }
+            EqChip(stringResource(R.string.eq_normal)) { onEqPreset(EqKind.FLAT) }
+            EqChip(stringResource(R.string.eq_bass)) { onEqPreset(EqKind.BASS) }
+            EqChip(stringResource(R.string.eq_treble)) { onEqPreset(EqKind.TREBLE) }
+            EqChip(stringResource(R.string.eq_vocal)) { onEqPreset(EqKind.VOICE) }
+            EqChip(stringResource(R.string.eq_movie)) { onEqPreset(EqKind.MOVIE) }
+            EqChip(stringResource(R.string.eq_dialogue)) { onEqPreset(EqKind.DIALOGUE) }
+            EqChip(stringResource(R.string.eq_noise_reduce)) { onEqPreset(EqKind.NOISE_REDUCE) }
         }
+        AudioSlider(stringResource(R.string.audio_loudness), loudness, 2000, onLoudness)
+        AudioSlider(stringResource(R.string.audio_bass), bass, 1000, onBass)
+        AudioSlider(stringResource(R.string.audio_surround), surround, 1000, onSurround)
+    }
+}
+
+@Composable
+private fun AudioSlider(label: String, value: Int, max: Int, onChange: (Int) -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        Text(label, color = TextSecondary, modifier = Modifier.fillMaxWidth(0.28f), fontSize = 12.sp)
+        Slider(
+            value = value.coerceIn(0, max).toFloat(),
+            onValueChange = { onChange(it.roundToInt().coerceIn(0, max)) },
+            valueRange = 0f..max.toFloat(),
+            modifier = Modifier.weight(1f),
+            colors = SliderDefaults.colors(thumbColor = GlowMagenta, activeTrackColor = GlowCyan),
+        )
     }
 }
 

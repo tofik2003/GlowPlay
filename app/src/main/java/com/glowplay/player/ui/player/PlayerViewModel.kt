@@ -2,7 +2,6 @@ package com.glowplay.player.ui.player
 
 import android.app.Application
 import android.media.AudioManager
-import android.media.audiofx.Equalizer
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -22,6 +21,8 @@ import com.glowplay.player.data.local.UserPreferences
 import com.glowplay.player.data.model.EnhanceSettings
 import com.glowplay.player.enhance.EnhancePreset
 import com.glowplay.player.enhance.GlowEffects
+import com.glowplay.player.playback.AudioEffects
+import com.glowplay.player.playback.EqKind
 import com.glowplay.player.playback.GlowPlayerFactory
 import com.glowplay.player.playback.PlayerHolder
 import kotlinx.coroutines.Job
@@ -57,6 +58,9 @@ data class PlayerUiState(
     val error: String? = null,
     val preferences: AppPreferences = AppPreferences(),
     val holdBoost: Boolean = false,
+    val loudness: Int = 0,
+    val bass: Int = 0,
+    val surround: Int = 0,
 )
 
 class PlayerViewModel(
@@ -71,7 +75,7 @@ class PlayerViewModel(
     var player: ExoPlayer
         private set
 
-    private var equalizer: Equalizer? = null
+    private val audioEffects = AudioEffects()
     private var mediaKey: String = ""
     private var playlist: List<String> = emptyList()
     private var progressJob: Job? = null
@@ -102,7 +106,7 @@ class PlayerViewModel(
         }
 
         override fun onAudioSessionIdChanged(audioSessionId: Int) {
-            if (audioSessionId != C.AUDIO_SESSION_ID_UNSET) attachEqualizer(audioSessionId)
+            if (audioSessionId != C.AUDIO_SESSION_ID_UNSET) attachAudioEffects(audioSessionId)
         }
 
         override fun onPlayerError(error: PlaybackException) {
@@ -156,13 +160,16 @@ class PlayerViewModel(
                     title = title.ifBlank { uri.lastPathSegment ?: "GlowPlay" },
                     preset = preset,
                     enhance = enhance,
+                    loudness = preferences.loudness,
+                    bass = preferences.bassBoost,
+                    surround = preferences.surround,
                     error = null,
                 )
             }
             applyEnhance(enhance, preset)
             player.prepare()
             player.playWhenReady = true
-            attachEqualizer()
+            attachAudioEffects()
             showControls()
         }
     }
@@ -270,25 +277,28 @@ class PlayerViewModel(
     }
 
     fun applyEqPreset(kind: EqKind) {
-        val eq = equalizer ?: return
-        runCatching {
-            val bands = eq.numberOfBands.toInt()
-            val range = eq.bandLevelRange
-            fun setAll(vararg levels: Int) {
-                repeat(bands) { index ->
-                    val level = (levels.getOrNull(index) ?: 0).toShort()
-                    eq.setBandLevel(index.toShort(), level.coerceIn(range[0], range[1]))
-                }
-            }
-            when (kind) {
-                EqKind.FLAT -> setAll(0, 0, 0, 0, 0)
-                EqKind.BASS -> setAll(900, 600, 100, -50, 0)
-                EqKind.TREBLE -> setAll(-50, 0, 200, 700, 900)
-                EqKind.VOICE -> setAll(-200, 100, 700, 500, 0)
-                EqKind.MOVIE -> setAll(400, 200, 0, 250, 450)
-            }
-            eq.enabled = true
-        }
+        audioEffects.applyEq(kind)
+    }
+
+    fun setLoudness(mb: Int) {
+        val value = mb.coerceIn(0, 2000)
+        _state.update { it.copy(loudness = value) }
+        audioEffects.setLoudness(value)
+        viewModelScope.launch { prefs.setLoudness(value) }
+    }
+
+    fun setBass(strength: Int) {
+        val value = strength.coerceIn(0, 1000)
+        _state.update { it.copy(bass = value) }
+        audioEffects.setBass(value)
+        viewModelScope.launch { prefs.setBass(value) }
+    }
+
+    fun setSurround(strength: Int) {
+        val value = strength.coerceIn(0, 1000)
+        _state.update { it.copy(surround = value) }
+        audioEffects.setSurround(value)
+        viewModelScope.launch { prefs.setSurround(value) }
     }
 
     fun volumeDelta(contextReady: AudioManager, delta: Int) {
@@ -310,8 +320,7 @@ class PlayerViewModel(
         hideJob?.cancel()
         enhanceJob?.cancel()
         runCatching { player.removeListener(listener) }
-        runCatching { equalizer?.release() }
-        equalizer = null
+        audioEffects.release()
         super.onCleared()
     }
 
@@ -332,12 +341,17 @@ class PlayerViewModel(
         }
     }
 
-    private fun attachEqualizer(audioSessionId: Int = player.audioSessionId) {
+    private fun attachAudioEffects(audioSessionId: Int = player.audioSessionId) {
         if (audioSessionId == C.AUDIO_SESSION_ID_UNSET) return
-        runCatching {
-            equalizer?.release()
-            equalizer = Equalizer(0, audioSessionId).apply { enabled = true }
-        }
+        audioEffects.attach(audioSessionId)
+        applyAudioEnhance()
+    }
+
+    private fun applyAudioEnhance() {
+        val s = _state.value
+        audioEffects.setLoudness(s.loudness)
+        audioEffects.setBass(s.bass)
+        audioEffects.setSurround(s.surround)
     }
 
     private fun refreshTracks(tracks: Tracks) {
@@ -377,8 +391,6 @@ class PlayerViewModel(
             }
         }
     }
-
-    enum class EqKind { FLAT, BASS, TREBLE, VOICE, MOVIE }
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
