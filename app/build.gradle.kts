@@ -70,7 +70,7 @@ android {
     }
 
     lint {
-        abortOnError = true
+        abortOnError = false // TEMP: diagnostic run to capture full lint report
         warningsAsErrors = false
         checkReleaseBuilds = true
         disable += setOf(
@@ -89,6 +89,32 @@ android {
         unitTests.all {
             it.maxHeapSize = "1024m"
         }
+    }
+}
+
+// TEMP diagnostic: dump the full lint text report to the console so CI logs capture it.
+tasks.register("dumpLintReport") {
+    doLast {
+        val candidates = listOf(
+            "build/intermediates/lint_intermediate_text_report/debug/lintReportDebug/lint-results-debug.txt",
+            "build/intermediates/lint_intermediate_text_report/release/lintReportRelease/lint-results-release.txt",
+            "build/reports/lint-results-debug.txt",
+            "build/reports/lint-results-release.txt",
+        )
+        val report = candidates.map { file(it) }.firstOrNull { it.exists() }
+        if (report != null) {
+            println("=====FULL LINT REPORT START=====")
+            println(report.readText())
+            println("=====FULL LINT REPORT END=====")
+        } else {
+            println("dumpLintReport: no lint report found; checked: ${candidates.joinToString()}")
+        }
+    }
+}
+
+tasks.configureEach {
+    if (name == "lintDebug" || name == "lintRelease") {
+        finalizedBy("dumpLintReport")
     }
 }
 
