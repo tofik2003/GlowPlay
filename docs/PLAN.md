@@ -26,6 +26,26 @@ Local library, folders, resume, double-tap seek, brightness/volume swipes, lock,
 - Cyan/magenta night cinema UI instead of MX orange  
 - Continue tab with glow progress  
 
+## 1b. Audio enhancements
+
+The equalizer sheet ships seven presets — Flat, Bass, Treble, Voice, Movie,
+**Dialogue** (mid/vocal lift for speech-heavy scenes) and **Noise reducer**
+(cuts low rumble and high hiss) — plus three playback effects:
+
+- **Loudness** (`LoudnessEnhancer`, 0–20 dB target gain) for quiet sources  
+- **Bass** (`BassBoost`)  
+- **Surround** (`Virtualizer`)  
+
+All four effects are optional and attach to the player's audio session id; each
+is persisted in DataStore and restored per video.
+
+> A true microphone-side noise canceller is **not possible for playback** — the
+> Android `NoiseSuppressor` / `AcousticEchoCanceler` APIs only attach to the
+> microphone capture path, never to a player's output. The "Noise reducer"
+> preset and Loudness control are the closest playback-side equivalent. If
+> GlowPlay ever gains a recording feature, `NoiseSuppressor.create(audioSession)`
+> would be the correct hook.  
+
 ## 2. App icon
 
 Adaptive icon (API 26+, our minSdk):
