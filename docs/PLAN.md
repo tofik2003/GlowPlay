@@ -63,6 +63,21 @@ A **tracks sheet** (subtitles icon in the bottom control bar) exposes:
 (immersive, swipe-to-reveal) whenever it is in landscape and the
 `immersive_landscape` preference is on; rotating back to portrait restores them.
 
+## 1d. Film post-processing (custom GLSL)
+
+The GlowEnhance color grade runs as a single `RgbMatrix` pass. On top of it, a
+custom GLSL program (`GlowFilmShaderProgram` + `GlowFilmEffect`, an ES 2.0
+fragment shader in `assets/shaders/`) adds three frame effects in one pass:
+
+- **Sharpen** — unsharp-mask (4-neighbour blur, high-frequency residual added back)  
+- **Vignette** — radial darkening toward the corners  
+- **Film grain** — per-pixel noise that animates over time via `uPresentationTimeUs`  
+
+The effect is chained after the color matrix in `toMedia3Effects`, is skipped
+entirely when all three amounts are zero, and each amount is persisted and
+restored per playback. It works only with the default `MediaCodecVideoRenderer`
+and is skipped on DRM content, matching Media3's documented effect limitations.
+
 ## 2. App icon
 
 Adaptive icon (API 26+, our minSdk):

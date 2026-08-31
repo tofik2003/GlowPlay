@@ -32,6 +32,9 @@ data class AppPreferences(
     val subtitleSize: Float = 1f,
     val subtitlePosition: Float = 0.08f,
     val immersiveLandscape: Boolean = true,
+    val sharpen: Float = 0f,
+    val vignette: Float = 0f,
+    val grain: Float = 0f,
 )
 
 class UserPreferences(context: Context) {
@@ -53,6 +56,10 @@ class UserPreferences(context: Context) {
     suspend fun setSubtitleSize(value: Float) = setFloat(Keys.subtitleSize, value.coerceIn(0.5f, 2f))
     suspend fun setSubtitlePosition(value: Float) = setFloat(Keys.subtitlePosition, value.coerceIn(0f, 0.5f))
     suspend fun setImmersiveLandscape(value: Boolean) = set(Keys.immersive, value)
+
+    suspend fun setSharpen(value: Float) = setFloat(Keys.sharpen, value.coerceIn(0f, 1f))
+    suspend fun setVignette(value: Float) = setFloat(Keys.vignette, value.coerceIn(0f, 1f))
+    suspend fun setGrain(value: Float) = setFloat(Keys.grain, value.coerceIn(0f, 1f))
 
     suspend fun setPreset(preset: EnhancePreset) {
         dataStore.edit { it[Keys.preset] = preset.storageKey }
@@ -119,6 +126,9 @@ class UserPreferences(context: Context) {
             subtitleSize = (this[Keys.subtitleSize] ?: 1f).coerceIn(0.5f, 2f),
             subtitlePosition = (this[Keys.subtitlePosition] ?: 0.08f).coerceIn(0f, 0.5f),
             immersiveLandscape = this[Keys.immersive] ?: true,
+            sharpen = (this[Keys.sharpen] ?: 0f).coerceIn(0f, 1f),
+            vignette = (this[Keys.vignette] ?: 0f).coerceIn(0f, 1f),
+            grain = (this[Keys.grain] ?: 0f).coerceIn(0f, 1f),
         )
     }
 
@@ -138,5 +148,8 @@ class UserPreferences(context: Context) {
         val subtitleSize = floatPreferencesKey("subtitle_size")
         val subtitlePosition = floatPreferencesKey("subtitle_position")
         val immersive = booleanPreferencesKey("immersive_landscape")
+        val sharpen = floatPreferencesKey("film_sharpen")
+        val vignette = floatPreferencesKey("film_vignette")
+        val grain = floatPreferencesKey("film_grain")
     }
 }

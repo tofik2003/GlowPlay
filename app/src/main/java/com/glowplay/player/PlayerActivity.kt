@@ -74,6 +74,9 @@ class PlayerActivity : AppCompatActivity() {
                     onSelectText = playerViewModel::selectText,
                     onSubtitleSize = playerViewModel::setSubtitleSize,
                     onSubtitlePosition = playerViewModel::setSubtitlePosition,
+                    onSharpen = playerViewModel::setSharpen,
+                    onVignette = playerViewModel::setVignette,
+                    onGrain = playerViewModel::setGrain,
                     onPip = { enterPip() },
                     onRotate = { rotateActivity(this) },
                 )

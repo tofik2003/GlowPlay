@@ -24,6 +24,7 @@ import com.glowplay.player.enhance.EnhancePreset
 import com.glowplay.player.enhance.GlowEffects
 import com.glowplay.player.playback.AudioEffects
 import com.glowplay.player.playback.EqKind
+import com.glowplay.player.playback.FilmFx
 import com.glowplay.player.playback.GlowPlayerFactory
 import com.glowplay.player.playback.PlayerHolder
 import kotlinx.coroutines.Job
@@ -65,6 +66,9 @@ data class PlayerUiState(
     val tracksOpen: Boolean = false,
     val subtitleSize: Float = 1f,
     val subtitlePosition: Float = 0.08f,
+    val sharpen: Float = 0f,
+    val vignette: Float = 0f,
+    val grain: Float = 0f,
 )
 
 class PlayerViewModel(
@@ -170,6 +174,9 @@ class PlayerViewModel(
                     surround = preferences.surround,
                     subtitleSize = preferences.subtitleSize,
                     subtitlePosition = preferences.subtitlePosition,
+                    sharpen = preferences.sharpen,
+                    vignette = preferences.vignette,
+                    grain = preferences.grain,
                     error = null,
                 )
             }
@@ -272,6 +279,32 @@ class PlayerViewModel(
         val value = position.coerceIn(0f, 0.5f)
         _state.update { it.copy(subtitlePosition = value) }
         viewModelScope.launch { prefs.setSubtitlePosition(value) }
+    }
+
+    fun setSharpen(value: Float) {
+        val v = value.coerceIn(0f, 1f)
+        _state.update { it.copy(sharpen = v) }
+        reapplyFilm()
+        viewModelScope.launch { prefs.setSharpen(v) }
+    }
+
+    fun setVignette(value: Float) {
+        val v = value.coerceIn(0f, 1f)
+        _state.update { it.copy(vignette = v) }
+        reapplyFilm()
+        viewModelScope.launch { prefs.setVignette(v) }
+    }
+
+    fun setGrain(value: Float) {
+        val v = value.coerceIn(0f, 1f)
+        _state.update { it.copy(grain = v) }
+        reapplyFilm()
+        viewModelScope.launch { prefs.setGrain(v) }
+    }
+
+    private fun reapplyFilm() {
+        val s = _state.value
+        applyEnhanceNow(s.enhance, s.preset)
     }
 
     fun setPreset(preset: EnhancePreset) {
@@ -399,11 +432,17 @@ class PlayerViewModel(
     private fun applyEnhanceNow(settings: EnhanceSettings, preset: EnhancePreset) {
         val active = if (preset == EnhancePreset.OFF) settings.copy(enabled = false) else settings
         val commands = GlowEffects.commands(active)
-        val signature = preset.storageKey + commands.joinToString { "${it.type}:${it.value}" }
+        val s = _state.value
+        val film = FilmFx(s.sharpen, s.vignette, s.grain)
+        val signature = buildString {
+            append(preset.storageKey)
+            commands.forEach { append(':').append(it.type).append(':').append(it.value) }
+            append("|fx").append(film.sharpen).append(':').append(film.vignette).append(':').append(film.grain)
+        }
         if (signature == lastAppliedSignature) return
         lastAppliedSignature = signature
         runCatching {
-            player.setVideoEffects(GlowPlayerFactory.toMedia3Effects(commands))
+            player.setVideoEffects(GlowPlayerFactory.toMedia3Effects(commands, film))
         }
     }
 

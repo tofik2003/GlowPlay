@@ -39,8 +39,12 @@ object GlowPlayerFactory {
             .build()
     }
 
-    fun toMedia3Effects(commands: List<GlowEffectCommand>): List<Effect> {
-        val matrix = GlowColorMatrix.fromCommands(commands) ?: return emptyList()
-        return listOf(matrix)
+    fun toMedia3Effects(commands: List<GlowEffectCommand>, film: FilmFx = FilmFx()): List<Effect> {
+        val effects = mutableListOf<Effect>()
+        GlowColorMatrix.fromCommands(commands)?.let { effects += it }
+        if (!film.isIdentity) {
+            effects += GlowFilmEffect(film.sharpen, film.vignette, film.grain)
+        }
+        return effects
     }
 }

@@ -95,6 +95,10 @@
     <string name="subtitle_position">Subtitle position</string>
     <string name="immersive_landscape">Fullscreen in landscape</string>
 
+    <string name="film_sharpen">Sharpen</string>
+    <string name="film_vignette">Vignette</string>
+    <string name="film_grain">Film grain</string>
+
     <string name="notification_channel">Now playing</string>
     <string name="playback_channel_desc">GlowPlay media playback controls</string>
     <string name="cd_thumbnail">Video thumbnail</string>

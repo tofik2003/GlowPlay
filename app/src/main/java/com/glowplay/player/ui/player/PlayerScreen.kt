@@ -112,6 +112,9 @@ fun PlayerScreen(
     onSelectText: (Int) -> Unit,
     onSubtitleSize: (Float) -> Unit,
     onSubtitlePosition: (Float) -> Unit,
+    onSharpen: (Float) -> Unit,
+    onVignette: (Float) -> Unit,
+    onGrain: (Float) -> Unit,
     onPip: () -> Unit,
     onRotate: () -> Unit,
 ) {
@@ -377,6 +380,9 @@ fun PlayerScreen(
                     state = state,
                     onPreset = onPreset,
                     onEnhance = onEnhance,
+                    onSharpen = onSharpen,
+                    onVignette = onVignette,
+                    onGrain = onGrain,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .navigationBarsPadding(),
@@ -439,6 +445,9 @@ private fun EnhancePanel(
     state: PlayerUiState,
     onPreset: (EnhancePreset) -> Unit,
     onEnhance: ((EnhanceSettings) -> EnhanceSettings) -> Unit,
+    onSharpen: (Float) -> Unit,
+    onVignette: (Float) -> Unit,
+    onGrain: (Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -478,6 +487,9 @@ private fun EnhancePanel(
         EnhanceSlider(stringResource(R.string.ambient_glow), state.enhance.glow * 2f - 1f) {
             onEnhance { s -> s.copy(glow = ((it + 1f) / 2f).coerceIn(0f, 1f), enabled = true) }
         }
+        FloatSlider(stringResource(R.string.film_sharpen), state.sharpen, 0f..1f, onSharpen)
+        FloatSlider(stringResource(R.string.film_vignette), state.vignette, 0f..1f, onVignette)
+        FloatSlider(stringResource(R.string.film_grain), state.grain, 0f..1f, onGrain)
     }
 }
 
@@ -594,13 +606,13 @@ private fun TracksPanel(
         textTracks.forEachIndexed { index, label ->
             TrackRow(label, selectedText == index) { onSelectText(index) }
         }
-        SubtitleSlider(
+        FloatSlider(
             label = stringResource(R.string.subtitle_size),
             value = subtitleSize,
             valueRange = 0.5f..2f,
             onChange = onSubtitleSize,
         )
-        SubtitleSlider(
+        FloatSlider(
             label = stringResource(R.string.subtitle_position),
             value = subtitlePosition,
             valueRange = 0f..0.5f,
@@ -634,7 +646,7 @@ private fun TrackRow(label: String, selected: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-private fun SubtitleSlider(
+private fun FloatSlider(
     label: String,
     value: Float,
     valueRange: ClosedFloatingPointRange<Float>,
