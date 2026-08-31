@@ -79,10 +79,11 @@ class GlowColorMatrix private constructor(
             val lr = 0.2126f
             val lg = 0.7152f
             val lb = 0.0722f
+            // Column-major (transpose of the standard row-major saturation matrix).
             return floatArrayOf(
-                lr * inv + scale, lg * inv, lb * inv, 0f,
-                lr * inv, lg * inv + scale, lb * inv, 0f,
-                lr * inv, lg * inv, lb * inv + scale, 0f,
+                lr * inv + scale, lr * inv, lr * inv, 0f,
+                lg * inv, lg * inv + scale, lg * inv, 0f,
+                lb * inv, lb * inv, lb * inv + scale, 0f,
                 0f, 0f, 0f, 1f,
             )
         }
