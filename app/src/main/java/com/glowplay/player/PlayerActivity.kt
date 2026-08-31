@@ -14,6 +14,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.ui.PlayerView
@@ -31,6 +34,7 @@ class PlayerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         playerViewModel = ViewModelProvider(this, PlayerViewModel.Factory)[PlayerViewModel::class.java]
+        updateSystemBars()
         handleIntent(intent)
         setContent {
             val state by playerViewModel.state.collectAsStateWithLifecycle()
@@ -65,6 +69,11 @@ class PlayerActivity : AppCompatActivity() {
                     onLoudness = playerViewModel::setLoudness,
                     onBass = playerViewModel::setBass,
                     onSurround = playerViewModel::setSurround,
+                    onTracksOpen = playerViewModel::setTracksOpen,
+                    onSelectAudio = playerViewModel::selectAudio,
+                    onSelectText = playerViewModel::selectText,
+                    onSubtitleSize = playerViewModel::setSubtitleSize,
+                    onSubtitlePosition = playerViewModel::setSubtitlePosition,
                     onPip = { enterPip() },
                     onRotate = { rotateActivity(this) },
                 )
@@ -90,6 +99,23 @@ class PlayerActivity : AppCompatActivity() {
         inPip = isInPictureInPictureMode
         if (isInPictureInPictureMode) {
             playerViewModel.setEnhanceOpen(false)
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        updateSystemBars()
+    }
+
+    private fun updateSystemBars() {
+        val controller = WindowCompat.getInsetsController(window, window.decorView)
+        controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        val immersive = playerViewModel.state.value.preferences.immersiveLandscape &&
+            resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        if (immersive) {
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+        } else {
+            controller.show(WindowInsetsCompat.Type.systemBars())
         }
     }
 

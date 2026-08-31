@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -28,6 +29,9 @@ data class AppPreferences(
     val loudness: Int = 0,
     val bassBoost: Int = 0,
     val surround: Int = 0,
+    val subtitleSize: Float = 1f,
+    val subtitlePosition: Float = 0.08f,
+    val immersiveLandscape: Boolean = true,
 )
 
 class UserPreferences(context: Context) {
@@ -45,6 +49,10 @@ class UserPreferences(context: Context) {
     suspend fun setLoudness(value: Int) = setInt(Keys.loudness, value)
     suspend fun setBass(value: Int) = setInt(Keys.bass, value)
     suspend fun setSurround(value: Int) = setInt(Keys.surround, value)
+
+    suspend fun setSubtitleSize(value: Float) = setFloat(Keys.subtitleSize, value.coerceIn(0.5f, 2f))
+    suspend fun setSubtitlePosition(value: Float) = setFloat(Keys.subtitlePosition, value.coerceIn(0f, 0.5f))
+    suspend fun setImmersiveLandscape(value: Boolean) = set(Keys.immersive, value)
 
     suspend fun setPreset(preset: EnhancePreset) {
         dataStore.edit { it[Keys.preset] = preset.storageKey }
@@ -72,6 +80,10 @@ class UserPreferences(context: Context) {
     }
 
     private suspend fun setInt(key: Preferences.Key<Int>, value: Int) {
+        dataStore.edit { it[key] = value }
+    }
+
+    private suspend fun setFloat(key: Preferences.Key<Float>, value: Float) {
         dataStore.edit { it[key] = value }
     }
 
@@ -104,6 +116,9 @@ class UserPreferences(context: Context) {
             loudness = (this[Keys.loudness] ?: 0).coerceIn(0, 2000),
             bassBoost = (this[Keys.bass] ?: 0).coerceIn(0, 1000),
             surround = (this[Keys.surround] ?: 0).coerceIn(0, 1000),
+            subtitleSize = (this[Keys.subtitleSize] ?: 1f).coerceIn(0.5f, 2f),
+            subtitlePosition = (this[Keys.subtitlePosition] ?: 0.08f).coerceIn(0f, 0.5f),
+            immersiveLandscape = this[Keys.immersive] ?: true,
         )
     }
 
@@ -120,5 +135,8 @@ class UserPreferences(context: Context) {
         val loudness = intPreferencesKey("audio_loudness")
         val bass = intPreferencesKey("audio_bass")
         val surround = intPreferencesKey("audio_surround")
+        val subtitleSize = floatPreferencesKey("subtitle_size")
+        val subtitlePosition = floatPreferencesKey("subtitle_position")
+        val immersive = booleanPreferencesKey("immersive_landscape")
     }
 }

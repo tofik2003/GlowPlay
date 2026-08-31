@@ -100,6 +100,7 @@ fun GlowPlayNav(
                 onHoldSpeed = settingsVm::setHoldSpeed,
                 onHardware = settingsVm::setHardware,
                 onPip = settingsVm::setPip,
+                onImmersive = settingsVm::setImmersive,
                 onPreset = settingsVm::setPreset,
             )
         }

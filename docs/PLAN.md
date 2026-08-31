@@ -46,6 +46,23 @@ is persisted in DataStore and restored per video.
 > GlowPlay ever gains a recording feature, `NoiseSuppressor.create(audioSession)`
 > would be the correct hook.  
 
+## 1c. Tracks, subtitles & fullscreen
+
+A **tracks sheet** (subtitles icon in the bottom control bar) exposes:
+
+- **Audio track** list — real track switching via `TrackSelectionOverride`
+  (previously the ViewModel tracked tracks but never surfaced them or changed
+  them).
+- **Subtitles** — "Off" plus every embedded text track, with proper
+  enable/disable via `TrackSelectionParameters`.
+- **Subtitle size** (0.5×–2×) and **position** (bottom padding) applied live
+  through `SubtitleView.setFractionalTextSize` / `setBottomPaddingFraction`.
+  Both persist in DataStore.
+
+**Fullscreen in landscape** — the player hides the status and navigation bars
+(immersive, swipe-to-reveal) whenever it is in landscape and the
+`immersive_landscape` preference is on; rotating back to portrait restores them.
+
 ## 2. App icon
 
 Adaptive icon (API 26+, our minSdk):

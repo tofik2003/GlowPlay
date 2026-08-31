@@ -30,6 +30,7 @@ class SettingsViewModel(
     fun setHoldSpeed(value: Boolean) = launch { prefs.setLongPressSpeed(value) }
     fun setHardware(value: Boolean) = launch { prefs.setHardwareDecoder(value) }
     fun setPip(value: Boolean) = launch { prefs.setPipOnLeave(value) }
+    fun setImmersive(value: Boolean) = launch { prefs.setImmersiveLandscape(value) }
     fun setPreset(value: EnhancePreset) = launch { prefs.setPreset(value) }
 
     private fun launch(block: suspend () -> Unit) {

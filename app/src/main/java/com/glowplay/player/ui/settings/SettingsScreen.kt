@@ -39,6 +39,7 @@ fun SettingsScreen(
     onHoldSpeed: (Boolean) -> Unit,
     onHardware: (Boolean) -> Unit,
     onPip: (Boolean) -> Unit,
+    onImmersive: (Boolean) -> Unit,
     onPreset: (EnhancePreset) -> Unit,
 ) {
     Column(
@@ -56,6 +57,7 @@ fun SettingsScreen(
         ToggleRow(stringResource(R.string.autoplay_next), state.autoplayNext, onAutoplay)
         ToggleRow(stringResource(R.string.hardware_decoder), state.hardwareDecoder, onHardware)
         ToggleRow(stringResource(R.string.pip_on_leave), state.pipOnLeave, onPip)
+        ToggleRow(stringResource(R.string.immersive_landscape), state.immersiveLandscape, onImmersive)
         Section(stringResource(R.string.settings_gestures))
         ToggleRow(stringResource(R.string.enable_gestures), state.gesturesEnabled, onGestures)
         ToggleRow(stringResource(R.string.long_press_speed), state.longPressSpeed, onHoldSpeed)

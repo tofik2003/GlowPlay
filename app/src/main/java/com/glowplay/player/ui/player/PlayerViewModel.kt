@@ -12,6 +12,7 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.Tracks
 import androidx.media3.exoplayer.ExoPlayer
 import com.glowplay.player.GlowPlayApp
@@ -61,6 +62,9 @@ data class PlayerUiState(
     val loudness: Int = 0,
     val bass: Int = 0,
     val surround: Int = 0,
+    val tracksOpen: Boolean = false,
+    val subtitleSize: Float = 1f,
+    val subtitlePosition: Float = 0.08f,
 )
 
 class PlayerViewModel(
@@ -76,6 +80,7 @@ class PlayerViewModel(
         private set
 
     private val audioEffects = AudioEffects()
+    private var currentTracks: Tracks? = null
     private var mediaKey: String = ""
     private var playlist: List<String> = emptyList()
     private var progressJob: Job? = null
@@ -163,6 +168,8 @@ class PlayerViewModel(
                     loudness = preferences.loudness,
                     bass = preferences.bassBoost,
                     surround = preferences.surround,
+                    subtitleSize = preferences.subtitleSize,
+                    subtitlePosition = preferences.subtitlePosition,
                     error = null,
                 )
             }
@@ -231,20 +238,37 @@ class PlayerViewModel(
         if (_state.value.locked) return
         if (_state.value.controlsVisible) {
             hideJob?.cancel()
-            _state.update { it.copy(controlsVisible = false, enhanceOpen = false, eqOpen = false) }
+            _state.update { it.copy(controlsVisible = false, enhanceOpen = false, eqOpen = false, tracksOpen = false) }
         } else {
             showControls()
         }
     }
 
     fun setEnhanceOpen(open: Boolean) {
-        _state.update { it.copy(enhanceOpen = open, eqOpen = false, controlsVisible = true) }
+        _state.update { it.copy(enhanceOpen = open, eqOpen = false, tracksOpen = false, controlsVisible = true) }
         hideJob?.cancel()
     }
 
     fun setEqOpen(open: Boolean) {
-        _state.update { it.copy(eqOpen = open, enhanceOpen = false, controlsVisible = true) }
+        _state.update { it.copy(eqOpen = open, enhanceOpen = false, tracksOpen = false, controlsVisible = true) }
         hideJob?.cancel()
+    }
+
+    fun setTracksOpen(open: Boolean) {
+        _state.update { it.copy(tracksOpen = open, enhanceOpen = false, eqOpen = false, controlsVisible = true) }
+        hideJob?.cancel()
+    }
+
+    fun setSubtitleSize(size: Float) {
+        val value = size.coerceIn(0.5f, 2f)
+        _state.update { it.copy(subtitleSize = value) }
+        viewModelScope.launch { prefs.setSubtitleSize(value) }
+    }
+
+    fun setSubtitlePosition(position: Float) {
+        val value = position.coerceIn(0f, 0.5f)
+        _state.update { it.copy(subtitlePosition = value) }
+        viewModelScope.launch { prefs.setSubtitlePosition(value) }
     }
 
     fun setPreset(preset: EnhancePreset) {
@@ -262,18 +286,46 @@ class PlayerViewModel(
     }
 
     fun selectAudio(index: Int) {
-        val parameters = player.trackSelectionParameters.buildUpon()
-            .setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, false)
-            .build()
-        player.trackSelectionParameters = parameters
-        _state.update { it.copy(selectedAudio = index) }
+        selectTrack(C.TRACK_TYPE_AUDIO, index) { selected ->
+            _state.update { it.copy(selectedAudio = selected) }
+        }
     }
 
     fun selectText(index: Int) {
-        player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
-            .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, index < 0)
-            .build()
-        _state.update { it.copy(selectedText = index) }
+        selectTrack(C.TRACK_TYPE_TEXT, index) { selected ->
+            _state.update { it.copy(selectedText = selected) }
+        }
+    }
+
+    /**
+     * Selects the [targetIndex]-th supported track of [type], or disables the
+     * type entirely when [targetIndex] is negative (subtitles "Off").
+     */
+    private fun selectTrack(type: Int, targetIndex: Int, onSelected: (Int) -> Unit) {
+        val tracks = currentTracks ?: return
+        val builder = player.trackSelectionParameters.buildUpon()
+        if (targetIndex < 0) {
+            builder.setTrackTypeDisabled(type, true)
+            player.trackSelectionParameters = builder.build()
+            onSelected(-1)
+            return
+        }
+        var seen = 0
+        for (group in tracks.groups) {
+            if (group.type != type) continue
+            for (trackIndex in 0 until group.length) {
+                if (!group.isTrackSupported(trackIndex)) continue
+                if (seen == targetIndex) {
+                    builder.setOverrideForType(
+                        TrackSelectionOverride(group.getMediaTrackGroup(), trackIndex),
+                    )
+                    player.trackSelectionParameters = builder.build()
+                    onSelected(targetIndex)
+                    return
+                }
+                seen++
+            }
+        }
     }
 
     fun applyEqPreset(kind: EqKind) {
@@ -355,11 +407,18 @@ class PlayerViewModel(
     }
 
     private fun refreshTracks(tracks: Tracks) {
+        currentTracks = tracks
         val audio = mutableListOf<String>()
         val text = mutableListOf<String>()
+        var selectedAudio = 0
+        var selectedText = -1
+        var audioSeen = 0
+        var textSeen = 0
         tracks.groups.forEach { group ->
             val type = group.type
-            repeat(group.length) { i ->
+            val isAudio = type == C.TRACK_TYPE_AUDIO
+            val isText = type == C.TRACK_TYPE_TEXT
+            for (i in 0 until group.length) {
                 val format = group.getTrackFormat(i)
                 val label = format.label ?: format.language ?: "Track ${i + 1}"
                 when (type) {
@@ -367,8 +426,21 @@ class PlayerViewModel(
                     C.TRACK_TYPE_TEXT -> text += label
                 }
             }
+            if (group.isSelected) {
+                if (isAudio) selectedAudio = audioSeen
+                if (isText) selectedText = textSeen
+            }
+            if (isAudio) audioSeen = audio.size
+            if (isText) textSeen = text.size
         }
-        _state.update { it.copy(audioTracks = audio, textTracks = text) }
+        _state.update {
+            it.copy(
+                audioTracks = audio,
+                textTracks = text,
+                selectedAudio = selectedAudio,
+                selectedText = selectedText,
+            )
+        }
     }
 
     private suspend fun persistPosition(forceClear: Boolean) {
@@ -386,7 +458,7 @@ class PlayerViewModel(
         hideJob?.cancel()
         hideJob = viewModelScope.launch {
             delay(3_600)
-            if (!_state.value.enhanceOpen && !_state.value.eqOpen && !_state.value.locked) {
+            if (!_state.value.enhanceOpen && !_state.value.eqOpen && !_state.value.tracksOpen && !_state.value.locked) {
                 _state.update { it.copy(controlsVisible = false) }
             }
         }

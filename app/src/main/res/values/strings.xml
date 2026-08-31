@@ -90,6 +90,11 @@
     <string name="audio_bass">Bass</string>
     <string name="audio_surround">Surround</string>
 
+    <string name="track_off">Off</string>
+    <string name="subtitle_size">Subtitle size</string>
+    <string name="subtitle_position">Subtitle position</string>
+    <string name="immersive_landscape">Fullscreen in landscape</string>
+
     <string name="notification_channel">Now playing</string>
     <string name="playback_channel_desc">GlowPlay media playback controls</string>
     <string name="cd_thumbnail">Video thumbnail</string>

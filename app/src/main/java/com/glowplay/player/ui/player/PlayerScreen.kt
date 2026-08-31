@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -40,6 +41,7 @@ import androidx.compose.material.icons.outlined.Rotate90DegreesCcw
 import androidx.compose.material.icons.outlined.SkipNext
 import androidx.compose.material.icons.outlined.SkipPrevious
 import androidx.compose.material.icons.outlined.Speed
+import androidx.compose.material.icons.outlined.Subtitles
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -64,6 +66,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
+import androidx.media3.ui.SubtitleView
 import com.glowplay.player.R
 import com.glowplay.player.data.model.EnhanceSettings
 import com.glowplay.player.enhance.EnhancePreset
@@ -104,6 +107,11 @@ fun PlayerScreen(
     onLoudness: (Int) -> Unit,
     onBass: (Int) -> Unit,
     onSurround: (Int) -> Unit,
+    onTracksOpen: (Boolean) -> Unit,
+    onSelectAudio: (Int) -> Unit,
+    onSelectText: (Int) -> Unit,
+    onSubtitleSize: (Float) -> Unit,
+    onSubtitlePosition: (Float) -> Unit,
     onPip: () -> Unit,
     onRotate: () -> Unit,
 ) {
@@ -179,6 +187,10 @@ fun PlayerScreen(
                 update = { view ->
                     view.resizeMode = resizeMode
                     view.useController = false
+                    view.getSubtitleView()?.apply {
+                        setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * state.subtitleSize)
+                        setBottomPaddingFraction(state.subtitlePosition)
+                    }
                 },
                 modifier = Modifier.fillMaxSize(),
             )
@@ -352,6 +364,9 @@ fun PlayerScreen(
                             IconButton(onClick = onRotate) {
                                 Icon(Icons.Outlined.Rotate90DegreesCcw, contentDescription = stringResource(R.string.rotate), tint = Color.White)
                             }
+                            IconButton(onClick = { onTracksOpen(!state.tracksOpen) }) {
+                                Icon(Icons.Outlined.Subtitles, contentDescription = stringResource(R.string.subtitles), tint = Color.White)
+                            }
                         }
                     }
                 }
@@ -376,6 +391,23 @@ fun PlayerScreen(
                     onLoudness = onLoudness,
                     onBass = onBass,
                     onSurround = onSurround,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .navigationBarsPadding(),
+                )
+            }
+            if (state.tracksOpen && !state.locked) {
+                TracksPanel(
+                    audioTracks = state.audioTracks,
+                    textTracks = state.textTracks,
+                    selectedAudio = state.selectedAudio,
+                    selectedText = state.selectedText,
+                    subtitleSize = state.subtitleSize,
+                    subtitlePosition = state.subtitlePosition,
+                    onSelectAudio = onSelectAudio,
+                    onSelectText = onSelectText,
+                    onSubtitleSize = onSubtitleSize,
+                    onSubtitlePosition = onSubtitlePosition,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .navigationBarsPadding(),
@@ -527,6 +559,97 @@ private fun EqChip(label: String, onClick: () -> Unit) {
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 8.dp),
     )
+}
+
+@Composable
+private fun TracksPanel(
+    audioTracks: List<String>,
+    textTracks: List<String>,
+    selectedAudio: Int,
+    selectedText: Int,
+    subtitleSize: Float,
+    subtitlePosition: Float,
+    onSelectAudio: (Int) -> Unit,
+    onSelectText: (Int) -> Unit,
+    onSubtitleSize: (Float) -> Unit,
+    onSubtitlePosition: (Float) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp))
+            .background(Color(0xEE0B111A))
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
+    ) {
+        if (audioTracks.isNotEmpty()) {
+            Text(stringResource(R.string.audio_track), color = GlowCyan)
+            audioTracks.forEachIndexed { index, label ->
+                TrackRow(label, selectedAudio == index) { onSelectAudio(index) }
+            }
+        }
+        Text(stringResource(R.string.subtitles), color = GlowCyan, modifier = Modifier.padding(top = 14.dp))
+        TrackRow(stringResource(R.string.track_off), selectedText == -1) { onSelectText(-1) }
+        textTracks.forEachIndexed { index, label ->
+            TrackRow(label, selectedText == index) { onSelectText(index) }
+        }
+        SubtitleSlider(
+            label = stringResource(R.string.subtitle_size),
+            value = subtitleSize,
+            valueRange = 0.5f..2f,
+            onChange = onSubtitleSize,
+        )
+        SubtitleSlider(
+            label = stringResource(R.string.subtitle_position),
+            value = subtitlePosition,
+            valueRange = 0f..0.5f,
+            onChange = onSubtitlePosition,
+        )
+    }
+}
+
+@Composable
+private fun TrackRow(label: String, selected: Boolean, onClick: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .background(if (selected) GlowCyan.copy(alpha = 0.18f) else Color.Transparent)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+    ) {
+        Text(
+            label,
+            color = if (selected) GlowCyan else TextPrimary,
+            fontSize = 13.sp,
+            maxLines = 1,
+            modifier = Modifier.weight(1f),
+        )
+        if (selected) {
+            Text("✓", color = GlowCyan, fontSize = 13.sp)
+        }
+    }
+}
+
+@Composable
+private fun SubtitleSlider(
+    label: String,
+    value: Float,
+    valueRange: ClosedFloatingPointRange<Float>,
+    onChange: (Float) -> Unit,
+) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        Text(label, color = TextSecondary, modifier = Modifier.fillMaxWidth(0.3f), fontSize = 12.sp)
+        Slider(
+            value = value.coerceIn(valueRange.start, valueRange.endInclusive),
+            onValueChange = onChange,
+            valueRange = valueRange,
+            modifier = Modifier.weight(1f),
+            colors = SliderDefaults.colors(thumbColor = GlowMagenta, activeTrackColor = GlowCyan),
+        )
+    }
 }
 
 fun rotateActivity(activity: Activity) {
