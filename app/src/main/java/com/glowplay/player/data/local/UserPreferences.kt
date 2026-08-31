@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.glowplay.player.data.model.EnhanceSettings
 import com.glowplay.player.enhance.EnhancePreset
+import com.glowplay.player.enhance.FilmLook
 import com.glowplay.player.enhance.VideoSort
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -35,6 +36,7 @@ data class AppPreferences(
     val sharpen: Float = 0f,
     val vignette: Float = 0f,
     val grain: Float = 0f,
+    val filmLook: FilmLook = FilmLook.NONE,
 )
 
 class UserPreferences(context: Context) {
@@ -60,6 +62,10 @@ class UserPreferences(context: Context) {
     suspend fun setSharpen(value: Float) = setFloat(Keys.sharpen, value.coerceIn(0f, 1f))
     suspend fun setVignette(value: Float) = setFloat(Keys.vignette, value.coerceIn(0f, 1f))
     suspend fun setGrain(value: Float) = setFloat(Keys.grain, value.coerceIn(0f, 1f))
+
+    suspend fun setFilmLook(look: FilmLook) {
+        dataStore.edit { it[Keys.filmLook] = look.storageKey }
+    }
 
     suspend fun setPreset(preset: EnhancePreset) {
         dataStore.edit { it[Keys.preset] = preset.storageKey }
@@ -129,6 +135,7 @@ class UserPreferences(context: Context) {
             sharpen = (this[Keys.sharpen] ?: 0f).coerceIn(0f, 1f),
             vignette = (this[Keys.vignette] ?: 0f).coerceIn(0f, 1f),
             grain = (this[Keys.grain] ?: 0f).coerceIn(0f, 1f),
+            filmLook = FilmLook.fromKey(this[Keys.filmLook]),
         )
     }
 
@@ -151,5 +158,6 @@ class UserPreferences(context: Context) {
         val sharpen = floatPreferencesKey("film_sharpen")
         val vignette = floatPreferencesKey("film_vignette")
         val grain = floatPreferencesKey("film_grain")
+        val filmLook = stringPreferencesKey("film_look")
     }
 }

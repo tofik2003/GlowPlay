@@ -78,14 +78,46 @@ entirely when all three amounts are zero, and each amount is persisted and
 restored per playback. It works only with the default `MediaCodecVideoRenderer`
 and is skipped on DRM content, matching Media3's documented effect limitations.
 
+## 1e. Film looks & the premium enhance sheet
+
+On top of the raw sliders, GlowPlay ships a **Film looks** system — the LUT-style
+one-tap equivalent implemented on the existing matrix + GLSL pipeline:
+
+| Look | Grade | Film |
+|---|---|---|
+| **Noir** | High contrast, near-monochrome | Heavy vignette + grain, slight sharpen |
+| **Teal** | Cool teal cast, contrast up | Mild vignette + grain, slight sharpen |
+| **Fade** | Lifted blacks, desaturated | Soft vignette + grain |
+| **Vintage** | Warm sepia | Grain + vignette |
+
+A `FilmLook` recipe carries both an `EnhanceSettings` grade and a `FilmFx` film
+stack, applied in a single tap (see `enhance/FilmLook.kt`, unit tested in
+`FilmLookTest`). Semantics kept simple:
+
+- Selecting a **film look** sets grade + film (preset becomes Custom).  
+- Selecting a **color preset** or dragging a **grade slider** leaves any film
+  look behind (the look's grade is overridden; the film sliders keep working).  
+- Dragging a **film slider** leaves the film look behind too.  
+- **None** keeps the current grade and clears the film stack.  
+- A **Reset** pill returns everything to Original in one tap.  
+
+The enhance sheet was redesigned around this: gradient **swatch cards** replace
+plain chips for both looks and presets, every slider shows a **live value badge**
+and a **reset dot**, and the whole sheet (plus EQ and tracks) slides in/out on a
+glass surface. Gestures now flash a **HUD** (brightness / volume / ±10s seek)
+and the playback-speed button opens a **speed menu** instead of cycling.
+
 ## 2. App icon
 
 Adaptive icon (API 26+, our minSdk):
 
 - **Background** `#070B12` midnight navy  
-- **Foreground** cyan play triangle inside a magenta ring (vector, safe-zone centered)  
+- **Foreground** layered neon mark — cyan play triangle with a bright inner
+  highlight inside a magenta ring and a cyan inner ring, soft cyan halo, lime
+  sparkle accent (vector, safe-zone centered)  
 - **Monochrome** (Android 13 themed icons) white triangle + ring  
-- **Splash** same mark on navy  
+- **Splash** same layered mark on navy  
+- **Notification** play triangle inside a ring  
 - Marketing raster: `docs/branding/glowplay-icon.png`
 
 Vectors live in:
@@ -220,7 +252,7 @@ Install `app/build/outputs/apk/debug/app-debug.apk`.
 ## 11. Roadmap after v1
 
 1. Real edge-color ambilight (Palette on sampled frames)  
-2. Custom GLSL unsharp/bloom GlEffect  
+2. Bloom / HDR tone-mapping pass (extend `GlowFilmShaderProgram`)  
 3. Subtitle file picker + styling  
 4. Play Store upload keystore via GitHub Actions secrets  
 5. Chromecast / MediaRoute  

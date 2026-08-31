@@ -99,6 +99,24 @@
     <string name="film_vignette">Vignette</string>
     <string name="film_grain">Film grain</string>
 
+    <string name="look_none">None</string>
+    <string name="look_noir">Noir</string>
+    <string name="look_teal">Teal</string>
+    <string name="look_fade">Fade</string>
+    <string name="look_vintage">Vintage</string>
+
+    <string name="section_look">Film look</string>
+    <string name="section_grade">Color grade</string>
+    <string name="section_film">Film</string>
+    <string name="reset">Reset</string>
+    <string name="default_film_look">Default film look</string>
+    <string name="enhance_original_hint">Original</string>
+
+    <string name="cd_volume">Volume</string>
+    <string name="cd_brightness">Brightness</string>
+    <string name="cd_seek">Seek</string>
+    <string name="speed_off">Speed</string>
+
     <string name="notification_channel">Now playing</string>
     <string name="playback_channel_desc">GlowPlay media playback controls</string>
     <string name="cd_thumbnail">Video thumbnail</string>

@@ -21,6 +21,7 @@ import com.glowplay.player.data.local.PlaybackStore
 import com.glowplay.player.data.local.UserPreferences
 import com.glowplay.player.data.model.EnhanceSettings
 import com.glowplay.player.enhance.EnhancePreset
+import com.glowplay.player.enhance.FilmLook
 import com.glowplay.player.enhance.GlowEffects
 import com.glowplay.player.playback.AudioEffects
 import com.glowplay.player.playback.EqKind
@@ -38,6 +39,19 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 enum class AspectMode { FIT, FILL, ZOOM }
+
+/** Kind of transient gesture feedback shown by the HUD. */
+enum class HudKind { BRIGHTNESS, VOLUME, SEEK }
+
+/**
+ * One-shot HUD feedback for a gesture: [progress] is a 0..1 level (or position
+ * fraction for seek) and [text] is the short label, e.g. "82%" or "+10s".
+ */
+data class GestureHud(
+    val kind: HudKind,
+    val progress: Float,
+    val text: String,
+)
 
 data class PlayerUiState(
     val title: String = "",
@@ -69,6 +83,8 @@ data class PlayerUiState(
     val sharpen: Float = 0f,
     val vignette: Float = 0f,
     val grain: Float = 0f,
+    val filmLook: FilmLook = FilmLook.NONE,
+    val gestureHud: GestureHud? = null,
 )
 
 class PlayerViewModel(
@@ -89,6 +105,7 @@ class PlayerViewModel(
     private var playlist: List<String> = emptyList()
     private var progressJob: Job? = null
     private var hideJob: Job? = null
+    private var hudJob: Job? = null
     private var lastAppliedSignature: String = ""
 
     private val listener = object : Player.Listener {
@@ -162,8 +179,18 @@ class PlayerViewModel(
             val preferences = prefs.flow.first()
             val resume = if (preferences.rememberPosition) playbackStore.get(resolvedKey) else 0L
             if (resume > 1_000L) player.seekTo(resume)
-            val preset = preferences.defaultPreset
-            val enhance = preset.settingsOr(preferences.customEnhance)
+            // A film look supplies its own grade + film; otherwise restore the
+            // default color preset and the manual film sliders.
+            val recipe = preferences.filmLook.recipe()
+            val (preset, enhance, film) = if (recipe.grade != null) {
+                Triple(EnhancePreset.CUSTOM, recipe.grade, recipe.film)
+            } else {
+                Triple(
+                    preferences.defaultPreset,
+                    preferences.defaultPreset.settingsOr(preferences.customEnhance),
+                    FilmFx(preferences.sharpen, preferences.vignette, preferences.grain),
+                )
+            }
             _state.update {
                 it.copy(
                     title = title.ifBlank { uri.lastPathSegment ?: "GlowPlay" },
@@ -174,16 +201,17 @@ class PlayerViewModel(
                     surround = preferences.surround,
                     subtitleSize = preferences.subtitleSize,
                     subtitlePosition = preferences.subtitlePosition,
-                    sharpen = preferences.sharpen,
-                    vignette = preferences.vignette,
-                    grain = preferences.grain,
+                    sharpen = film.sharpen,
+                    vignette = film.vignette,
+                    grain = film.grain,
+                    filmLook = preferences.filmLook,
                     error = null,
                 )
             }
             // Reset the cached signature so setVideoEffects is guaranteed to run
             // before prepare() on every playback start (Media3 requires it).
             lastAppliedSignature = ""
-            applyEnhanceNow(enhance, preset)
+            applyEnhanceNow(enhance, preset, film)
             player.prepare()
             player.playWhenReady = true
             attachAudioEffects()
@@ -283,23 +311,101 @@ class PlayerViewModel(
 
     fun setSharpen(value: Float) {
         val v = value.coerceIn(0f, 1f)
-        _state.update { it.copy(sharpen = v) }
+        // Manual film tweaks leave any active film look behind.
+        _state.update { it.copy(sharpen = v, filmLook = FilmLook.NONE) }
         reapplyFilm()
-        viewModelScope.launch { prefs.setSharpen(v) }
+        viewModelScope.launch {
+            prefs.setSharpen(v)
+            prefs.setFilmLook(FilmLook.NONE)
+        }
     }
 
     fun setVignette(value: Float) {
         val v = value.coerceIn(0f, 1f)
-        _state.update { it.copy(vignette = v) }
+        _state.update { it.copy(vignette = v, filmLook = FilmLook.NONE) }
         reapplyFilm()
-        viewModelScope.launch { prefs.setVignette(v) }
+        viewModelScope.launch {
+            prefs.setVignette(v)
+            prefs.setFilmLook(FilmLook.NONE)
+        }
     }
 
     fun setGrain(value: Float) {
         val v = value.coerceIn(0f, 1f)
-        _state.update { it.copy(grain = v) }
+        _state.update { it.copy(grain = v, filmLook = FilmLook.NONE) }
         reapplyFilm()
-        viewModelScope.launch { prefs.setGrain(v) }
+        viewModelScope.launch {
+            prefs.setGrain(v)
+            prefs.setFilmLook(FilmLook.NONE)
+        }
+    }
+
+    /** Applies a one-tap cinematic film look (grade + film FX). */
+    fun setFilmLook(look: FilmLook) {
+        val recipe = look.recipe()
+        val current = _state.value
+        if (recipe.grade != null) {
+            val next = recipe.grade.clamped().copy(enabled = true)
+            _state.update {
+                it.copy(
+                    filmLook = look,
+                    preset = EnhancePreset.CUSTOM,
+                    enhance = next,
+                    sharpen = recipe.film.sharpen,
+                    vignette = recipe.film.vignette,
+                    grain = recipe.film.grain,
+                )
+            }
+            applyEnhanceNow(next, EnhancePreset.CUSTOM, recipe.film)
+            viewModelScope.launch {
+                prefs.setCustomEnhance(next)
+                prefs.setPreset(EnhancePreset.CUSTOM)
+            }
+        } else {
+            // NONE keeps the current grade and just clears the film stack.
+            _state.update { it.copy(filmLook = look, sharpen = 0f, vignette = 0f, grain = 0f) }
+            applyEnhanceNow(current.enhance, current.preset, FilmFx())
+        }
+        viewModelScope.launch {
+            prefs.setFilmLook(look)
+            prefs.setSharpen(recipe.film.sharpen)
+            prefs.setVignette(recipe.film.vignette)
+            prefs.setGrain(recipe.film.grain)
+        }
+    }
+
+    /** Returns the player to Original: no grade, no film. */
+    fun resetEnhance() {
+        val original = EnhanceSettings.Original
+        _state.update {
+            it.copy(
+                preset = EnhancePreset.OFF,
+                enhance = original,
+                filmLook = FilmLook.NONE,
+                sharpen = 0f,
+                vignette = 0f,
+                grain = 0f,
+            )
+        }
+        applyEnhanceNow(original, EnhancePreset.OFF, FilmFx())
+        viewModelScope.launch {
+            prefs.setPreset(EnhancePreset.OFF)
+            prefs.setCustomEnhance(original)
+            prefs.setFilmLook(FilmLook.NONE)
+            prefs.setSharpen(0f)
+            prefs.setVignette(0f)
+            prefs.setGrain(0f)
+        }
+    }
+
+    /** Shows a transient gesture HUD and clears it after a short delay. */
+    fun flashHud(hud: GestureHud) {
+        _state.update { it.copy(gestureHud = hud) }
+        hudJob?.cancel()
+        hudJob = viewModelScope.launch {
+            delay(850)
+            _state.update { it.copy(gestureHud = null) }
+        }
     }
 
     private fun reapplyFilm() {
@@ -309,16 +415,27 @@ class PlayerViewModel(
 
     fun setPreset(preset: EnhancePreset) {
         val enhance = preset.settingsOr(_state.value.preferences.customEnhance)
-        _state.update { it.copy(preset = preset, enhance = enhance) }
+        // Choosing a color preset takes over the grade, so any active film look
+        // (which also carries a grade) is left behind; the film sliders keep
+        // their current values.
+        _state.update { it.copy(preset = preset, enhance = enhance, filmLook = FilmLook.NONE) }
         applyEnhance(enhance, preset)
-        viewModelScope.launch { prefs.setPreset(preset) }
+        viewModelScope.launch {
+            prefs.setPreset(preset)
+            prefs.setFilmLook(FilmLook.NONE)
+        }
     }
 
     fun updateEnhance(transform: (EnhanceSettings) -> EnhanceSettings) {
         val next = transform(_state.value.enhance).clamped().copy(enabled = true)
-        _state.update { it.copy(preset = EnhancePreset.CUSTOM, enhance = next) }
+        _state.update {
+            it.copy(preset = EnhancePreset.CUSTOM, enhance = next, filmLook = FilmLook.NONE)
+        }
         applyEnhance(next, EnhancePreset.CUSTOM)
-        viewModelScope.launch { prefs.setCustomEnhance(next) }
+        viewModelScope.launch {
+            prefs.setCustomEnhance(next)
+            prefs.setFilmLook(FilmLook.NONE)
+        }
     }
 
     fun selectAudio(index: Int) {
@@ -406,6 +523,7 @@ class PlayerViewModel(
     override fun onCleared() {
         progressJob?.cancel()
         hideJob?.cancel()
+        hudJob?.cancel()
         enhanceJob?.cancel()
         runCatching { player.removeListener(listener) }
         audioEffects.release()
@@ -429,20 +547,20 @@ class PlayerViewModel(
      * effects pipeline is set up, so [PlayerViewModel.prepare] calls this
      * synchronously before preparing the player.
      */
-    private fun applyEnhanceNow(settings: EnhanceSettings, preset: EnhancePreset) {
+    private fun applyEnhanceNow(settings: EnhanceSettings, preset: EnhancePreset, film: FilmFx? = null) {
         val active = if (preset == EnhancePreset.OFF) settings.copy(enabled = false) else settings
         val commands = GlowEffects.commands(active)
         val s = _state.value
-        val film = FilmFx(s.sharpen, s.vignette, s.grain)
+        val fx = film ?: FilmFx(s.sharpen, s.vignette, s.grain)
         val signature = buildString {
             append(preset.storageKey)
             commands.forEach { append(':').append(it.type).append(':').append(it.value) }
-            append("|fx").append(film.sharpen).append(':').append(film.vignette).append(':').append(film.grain)
+            append("|fx").append(fx.sharpen).append(':').append(fx.vignette).append(':').append(fx.grain)
         }
         if (signature == lastAppliedSignature) return
         lastAppliedSignature = signature
         runCatching {
-            player.setVideoEffects(GlowPlayerFactory.toMedia3Effects(commands, film))
+            player.setVideoEffects(GlowPlayerFactory.toMedia3Effects(commands, fx))
         }
     }
 

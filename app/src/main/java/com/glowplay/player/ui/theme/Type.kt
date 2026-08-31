@@ -6,11 +6,16 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
+/**
+ * GlowPlay typography — a tight, geometric night-cinema scale on the system
+ * sans-serif. Monospaced numerals are used for timestamps and values so the
+ * HUD and slider readouts stay visually stable.
+ */
 val GlowTypography = Typography(
     displaySmall = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Bold,
-        fontSize = 28.sp,
+        fontSize = 30.sp,
         letterSpacing = (-0.5).sp,
         color = TextPrimary,
     ),
@@ -18,6 +23,14 @@ val GlowTypography = Typography(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.SemiBold,
         fontSize = 22.sp,
+        letterSpacing = (-0.2).sp,
+        color = TextPrimary,
+    ),
+    headlineSmall = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 19.sp,
+        letterSpacing = (-0.1).sp,
         color = TextPrimary,
     ),
     titleLarge = TextStyle(
@@ -46,9 +59,30 @@ val GlowTypography = Typography(
     ),
     labelLarge = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.SemiBold,
         fontSize = 13.sp,
-        letterSpacing = 0.4.sp,
+        letterSpacing = 0.6.sp,
         color = GlowCyan,
     ),
+    labelMedium = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Medium,
+        fontSize = 11.sp,
+        letterSpacing = 0.9.sp,
+        color = TextSecondary,
+    ),
+    labelSmall = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Medium,
+        fontSize = 10.sp,
+        letterSpacing = 1.1.sp,
+        color = TextFaint,
+    ),
+)
+
+/** Monospaced/tabular numerals for HUD values and time readouts. */
+val TabularTextStyle = TextStyle(
+    fontFamily = FontFamily.SansSerif,
+    fontWeight = FontWeight.Medium,
+    fontFeatureSettings = "tnum",
 )

@@ -60,7 +60,9 @@ JDK 17 + Android SDK 35:
 
 Original · Glow · Cinema · Vivid · Night · Crystal · Warm · Cool · Custom sliders
 
-Gestures in the player: tap controls, double-tap ±10s, left vertical brightness, right vertical volume, hold 2×, lock, aspect, speed, PiP, rotate.
+**Film looks** (one tap = grade + film in a single GPU stack): Noir · Teal · Fade · Vintage, plus a manual Film section (sharpen / vignette / film grain) driven by a custom GLSL shader. The enhance sheet uses gradient swatch cards, live value badges, per-slider reset, and a one-tap Reset.
+
+Gestures in the player: tap controls, double-tap ±10s, left vertical brightness, right vertical volume, hold 2×, lock, aspect, speed menu, PiP, rotate — with a neon HUD showing brightness / volume / seek feedback.
 
 ## Architecture snapshot
 

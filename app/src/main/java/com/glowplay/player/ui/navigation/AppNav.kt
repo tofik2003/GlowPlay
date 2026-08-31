@@ -102,6 +102,7 @@ fun GlowPlayNav(
                 onPip = settingsVm::setPip,
                 onImmersive = settingsVm::setImmersive,
                 onPreset = settingsVm::setPreset,
+                onFilmLook = settingsVm::setFilmLook,
             )
         }
     }

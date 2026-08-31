@@ -12,7 +12,10 @@ private val GlowScheme = darkColorScheme(
     onPrimaryContainer = TextPrimary,
     secondary = GlowMagenta,
     onSecondary = Night,
-    tertiary = GlowLime,
+    secondaryContainer = GlowMagentaDeep,
+    onSecondaryContainer = TextPrimary,
+    tertiary = GlowViolet,
+    onTertiary = Night,
     background = Night,
     onBackground = TextPrimary,
     surface = NightElevated,
@@ -20,8 +23,10 @@ private val GlowScheme = darkColorScheme(
     surfaceVariant = NightCard,
     onSurfaceVariant = TextSecondary,
     outline = NightStroke,
+    outlineVariant = NightStrokeSoft,
     error = Danger,
     onError = Color.White,
+    scrim = NightDeep,
 )
 
 @Composable

@@ -5,6 +5,7 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -188,13 +189,15 @@ fun LibraryScreen(
                     )
                 }
             }
-            when {
-                state.loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = GlowCyan)
+            Crossfade(targetState = tab, label = "library-tab") { currentTab ->
+                when {
+                    state.loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = GlowCyan)
+                    }
+                    currentTab == 0 -> VideoGrid(state.videos, state, onOpenVideo)
+                    currentTab == 1 -> FolderList(state.folders, onOpenFolder)
+                    else -> RecentList(state.recents, state.videos, onOpenVideo)
                 }
-                tab == 0 -> VideoGrid(state.videos, state, onOpenVideo)
-                tab == 1 -> FolderList(state.folders, onOpenFolder)
-                else -> RecentList(state.recents, state.videos, onOpenVideo)
             }
         }
     }
