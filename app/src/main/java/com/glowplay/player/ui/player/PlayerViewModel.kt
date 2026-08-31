@@ -173,7 +173,10 @@ class PlayerViewModel(
                     error = null,
                 )
             }
-            applyEnhance(enhance, preset)
+            // Reset the cached signature so setVideoEffects is guaranteed to run
+            // before prepare() on every playback start (Media3 requires it).
+            lastAppliedSignature = ""
+            applyEnhanceNow(enhance, preset)
             player.prepare()
             player.playWhenReady = true
             attachAudioEffects()
@@ -382,14 +385,25 @@ class PlayerViewModel(
         enhanceJob?.cancel()
         enhanceJob = viewModelScope.launch {
             delay(150)
-            val active = if (preset == EnhancePreset.OFF) settings.copy(enabled = false) else settings
-            val commands = GlowEffects.commands(active)
-            val signature = preset.storageKey + commands.joinToString { "${it.type}:${it.value}" }
-            if (signature == lastAppliedSignature) return@launch
-            lastAppliedSignature = signature
-            runCatching {
-                player.setVideoEffects(GlowPlayerFactory.toMedia3Effects(commands))
-            }
+            applyEnhanceNow(settings, preset)
+        }
+    }
+
+    /**
+     * Applies the enhance settings immediately (no debounce). Media3 requires
+     * [androidx.media3.exoplayer.ExoPlayer.setVideoEffects] to be called at least
+     * once BEFORE [prepare][androidx.media3.exoplayer.ExoPlayer.prepare] so the GL
+     * effects pipeline is set up, so [PlayerViewModel.prepare] calls this
+     * synchronously before preparing the player.
+     */
+    private fun applyEnhanceNow(settings: EnhanceSettings, preset: EnhancePreset) {
+        val active = if (preset == EnhancePreset.OFF) settings.copy(enabled = false) else settings
+        val commands = GlowEffects.commands(active)
+        val signature = preset.storageKey + commands.joinToString { "${it.type}:${it.value}" }
+        if (signature == lastAppliedSignature) return
+        lastAppliedSignature = signature
+        runCatching {
+            player.setVideoEffects(GlowPlayerFactory.toMedia3Effects(commands))
         }
     }
 
