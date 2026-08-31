@@ -8,12 +8,7 @@ import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import androidx.media3.effect.Brightness
-import androidx.media3.effect.Contrast
-import androidx.media3.effect.HslAdjustment
-import androidx.media3.effect.RgbAdjustment
 import com.glowplay.player.enhance.GlowEffectCommand
-import com.glowplay.player.enhance.GlowEffects
 
 object GlowPlayerFactory {
     fun create(context: Context, hardwareDecoder: Boolean = true): ExoPlayer {
@@ -45,19 +40,7 @@ object GlowPlayerFactory {
     }
 
     fun toMedia3Effects(commands: List<GlowEffectCommand>): List<Effect> {
-        return commands.map { command ->
-            when (command.type) {
-                GlowEffectCommand.Type.BRIGHTNESS -> Brightness(command.value)
-                GlowEffectCommand.Type.CONTRAST -> Contrast(command.value)
-                GlowEffectCommand.Type.SATURATION -> HslAdjustment.Builder()
-                    .adjustSaturation(GlowEffects.saturationPercent(command.value))
-                    .build()
-                GlowEffectCommand.Type.WARMTH -> RgbAdjustment.Builder()
-                    .setRedScale(GlowEffects.redScale(command.value))
-                    .setGreenScale(1f)
-                    .setBlueScale(GlowEffects.blueScale(command.value))
-                    .build()
-            }
-        }
+        val matrix = GlowColorMatrix.fromCommands(commands) ?: return emptyList()
+        return listOf(matrix)
     }
 }
