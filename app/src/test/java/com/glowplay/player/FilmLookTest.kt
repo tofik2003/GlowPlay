@@ -1,5 +1,6 @@
 package com.glowplay.player
 
+import com.google.common.collect.Range
 import com.google.common.truth.Truth.assertThat
 import com.glowplay.player.enhance.FilmLook
 import org.junit.Test
@@ -49,16 +50,16 @@ class FilmLookTest {
             val recipe = look.recipe()
             recipe.grade?.let { grade ->
                 val clamped = grade.clamped()
-                assertThat(clamped.brightness).isIn(-1f, 1f)
-                assertThat(clamped.contrast).isIn(-1f, 1f)
-                assertThat(clamped.saturation).isIn(-1f, 1f)
-                assertThat(clamped.warmth).isIn(-1f, 1f)
-                assertThat(clamped.glow).isIn(0f, 1f)
+                assertThat(clamped.brightness).isIn(Range.closed(-1f, 1f))
+                assertThat(clamped.contrast).isIn(Range.closed(-1f, 1f))
+                assertThat(clamped.saturation).isIn(Range.closed(-1f, 1f))
+                assertThat(clamped.warmth).isIn(Range.closed(-1f, 1f))
+                assertThat(clamped.glow).isIn(Range.closed(0f, 1f))
             }
             val film = recipe.film
-            assertThat(film.sharpen).isIn(0f, 1f)
-            assertThat(film.vignette).isIn(0f, 1f)
-            assertThat(film.grain).isIn(0f, 1f)
+            assertThat(film.sharpen).isIn(Range.closed(0f, 1f))
+            assertThat(film.vignette).isIn(Range.closed(0f, 1f))
+            assertThat(film.grain).isIn(Range.closed(0f, 1f))
         }
     }
 
