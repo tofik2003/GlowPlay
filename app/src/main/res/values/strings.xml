@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GlowPlay</string>
+    <string name="app_tagline">Cinema light. Instant glow.</string>
+
+    <string name="tab_videos">Videos</string>
+    <string name="tab_folders">Folders</string>
+    <string name="tab_recent">Continue</string>
+
+    <string name="search_videos">Search videos</string>
+    <string name="settings">Settings</string>
+    <string name="sort">Sort</string>
+    <string name="grant_permission">Allow video access</string>
+    <string name="permission_title">Your library is locked</string>
+    <string name="permission_body">GlowPlay needs access to videos on this device so it can build your neon library and resume where you left off.</string>
+    <string name="permission_denied">Permission denied. You can enable it in system settings.</string>
+    <string name="open_settings">Open settings</string>
+    <string name="empty_library">No videos found on this device.</string>
+    <string name="empty_recent">Nothing to continue yet. Play a video and GlowPlay will remember it.</string>
+    <plurals name="videos_count">
+        <item quantity="one">%d video</item>
+        <item quantity="other">%d videos</item>
+    </plurals>
+    <string name="unknown_folder">Internal storage</string>
+
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="lock">Lock screen</string>
+    <string name="unlock">Unlock</string>
+    <string name="aspect_ratio">Aspect ratio</string>
+    <string name="playback_speed">Speed</string>
+    <string name="audio_track">Audio</string>
+    <string name="subtitles">Subtitles</string>
+    <string name="equalizer">Equalizer</string>
+    <string name="enhance">GlowEnhance</string>
+    <string name="pip">Picture in picture</string>
+    <string name="rotate">Rotate</string>
+    <string name="back">Back</string>
+    <string name="more">More</string>
+
+    <string name="preset_off">Original</string>
+    <string name="preset_glow">Glow</string>
+    <string name="preset_cinema">Cinema</string>
+    <string name="preset_vivid">Vivid</string>
+    <string name="preset_night">Night</string>
+    <string name="preset_crystal">Crystal</string>
+    <string name="preset_warm">Warm</string>
+    <string name="preset_cool">Cool</string>
+    <string name="preset_custom">Custom</string>
+
+    <string name="brightness">Brightness</string>
+    <string name="contrast">Contrast</string>
+    <string name="saturation">Saturation</string>
+    <string name="warmth">Warmth</string>
+    <string name="ambient_glow">Ambient glow</string>
+    <string name="apply_enhance">Live enhance is on</string>
+    <string name="enhance_off">Enhance off</string>
+
+    <string name="settings_playback">Playback</string>
+    <string name="settings_enhance">GlowEnhance</string>
+    <string name="settings_gestures">Gestures</string>
+    <string name="remember_position">Remember playback position</string>
+    <string name="autoplay_next">Autoplay next in folder</string>
+    <string name="default_preset">Default enhance preset</string>
+    <string name="enable_gestures">Swipe brightness / volume / seek</string>
+    <string name="long_press_speed">Hold for 2× speed</string>
+    <string name="hardware_decoder">Prefer hardware decoder</string>
+    <string name="pip_on_leave">Enter PiP when leaving player</string>
+    <string name="about">About GlowPlay</string>
+    <string name="about_body">GlowPlay is a local-first Android video player with a live GPU enhance engine, ambient glow, and MX-style gestures — built to look like a night cinema, not a clone.</string>
+    <string name="version_fmt">Version %1$s (%2$d)</string>
+
+    <string name="sort_date_new">Newest</string>
+    <string name="sort_date_old">Oldest</string>
+    <string name="sort_name">Name</string>
+    <string name="sort_duration">Duration</string>
+    <string name="sort_size">Size</string>
+
+    <string name="eq_normal">Flat</string>
+    <string name="eq_bass">Bass boost</string>
+    <string name="eq_treble">Treble</string>
+    <string name="eq_vocal">Voice</string>
+    <string name="eq_movie">Movie</string>
+    <string name="eq_dialogue">Dialogue</string>
+    <string name="eq_noise_reduce">Noise reducer</string>
+
+    <string name="audio_loudness">Loudness</string>
+    <string name="audio_bass">Bass</string>
+    <string name="audio_surround">Surround</string>
+
+    <string name="track_off">Off</string>
+    <string name="subtitle_size">Subtitle size</string>
+    <string name="subtitle_position">Subtitle position</string>
+    <string name="immersive_landscape">Fullscreen in landscape</string>
+
+    <string name="film_sharpen">Sharpen</string>
+    <string name="film_vignette">Vignette</string>
+    <string name="film_grain">Film grain</string>
+
+    <string name="look_none">None</string>
+    <string name="look_noir">Noir</string>
+    <string name="look_teal">Teal</string>
+    <string name="look_fade">Fade</string>
+    <string name="look_vintage">Vintage</string>
+
+    <string name="section_look">Film look</string>
+    <string name="section_grade">Color grade</string>
+    <string name="section_film">Film</string>
+    <string name="reset">Reset</string>
+    <string name="default_film_look">Default film look</string>
+    <string name="enhance_original_hint">Original</string>
+
+    <string name="cd_volume">Volume</string>
+    <string name="cd_brightness">Brightness</string>
+    <string name="cd_seek">Seek</string>
+    <string name="speed_off">Speed</string>
+
+    <string name="notification_channel">Now playing</string>
+    <string name="playback_channel_desc">GlowPlay media playback controls</string>
+    <string name="cd_thumbnail">Video thumbnail</string>
+    <string name="cd_glow_mark">GlowPlay mark</string>
+</resources>

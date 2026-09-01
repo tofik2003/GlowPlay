@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="UnusedResources" severity="ignore" />
+    <issue id="ContentDescription" severity="warning" />
+    <issue id="MissingTranslation" severity="ignore" />
+    <issue id="GradleDependency" severity="ignore" />
+    <issue id="OldTargetApi" severity="ignore" />
+    <issue id="UseAppTint" severity="ignore" />
+    <issue id="UnusedAttribute" severity="warning" />
+    <issue id="MissingDefaultResource" severity="ignore" />
+    <issue id="IconDensities" severity="ignore" />
+    <issue id="IconDuplicates" severity="ignore" />
+
+    <!-- Media3's UnstableApi is opted into project-wide via -opt-in in
+         build.gradle.kts; mirror that here so lint's opt-in check agrees. -->
+    <issue id="UnsafeOptInUsageError">
+        <option name="opt-in" value="androidx.media3.common.util.UnstableApi" />
+    </issue>
+</lint>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Soft outer neon halo -->
+    <path
+        android:fillColor="#1400F0FF"
+        android:pathData="M54,54m-36,0a36,36 0,1 1,72 0a36,36 0,1 1,-72 0" />
+    <path
+        android:fillColor="#1A00F0FF"
+        android:pathData="M54,54m-30,0a30,30 0,1 1,60 0a30,30 0,1 1,-60 0" />
+
+    <!-- Magenta outer ring -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M54,54m-25,0a25,25 0,1 1,50 0a25,25 0,1 1,-50 0"
+        android:strokeWidth="3"
+        android:strokeColor="#FF2BD6" />
+
+    <!-- Cyan inner ring -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M54,54m-21,0a21,21 0,1 1,42 0a21,21 0,1 1,-42 0"
+        android:strokeWidth="1.2"
+        android:strokeColor="#6600F0FF" />
+
+    <!-- Play mark: base triangle + bright inner highlight -->
+    <path
+        android:fillColor="#00F0FF"
+        android:pathData="M44,38 L44,70 L72,54 Z" />
+    <path
+        android:fillColor="#9FFBFF"
+        android:pathData="M52,44 L52,60 L63,54 Z" />
+
+    <!-- Lime sparkle accent -->
+    <path
+        android:fillColor="#7CFF6B"
+        android:pathData="M78,26 L79.2,30.8 L84,32 L79.2,33.2 L78,38 L76.8,33.2 L72,32 L76.8,30.8 Z" />
+</vector>
