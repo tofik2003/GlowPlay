@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="night">#FF070B12</color>
+    <color name="night_elevated">#FF0E1520</color>
+    <color name="glow_cyan">#FF00F0FF</color>
+    <color name="glow_magenta">#FFFF2BD6</color>
+    <color name="glow_lime">#FF7CFF6B</color>
+    <color name="ic_launcher_background">#FF070B12</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="scrim">#CC05070C</color>
+</resources>
