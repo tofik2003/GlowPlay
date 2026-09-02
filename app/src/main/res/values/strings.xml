@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GlowPlay</string>
-    <string name="app_tagline">Cinema light. Instant glow.</string>
+    <string name="app_tagline">Premium local video, beautifully enhanced.</string>
 
     <string name="tab_videos">Videos</string>
     <string name="tab_folders">Folders</string>
@@ -45,17 +45,34 @@
     <string name="preset_crystal">Crystal</string>
     <string name="preset_warm">Warm</string>
     <string name="preset_cool">Cool</string>
+    <string name="preset_sunset">Sunset</string>
+    <string name="preset_mono">Mono</string>
     <string name="preset_custom">Custom</string>
 
     <string name="brightness">Brightness</string>
     <string name="contrast">Contrast</string>
     <string name="saturation">Saturation</string>
     <string name="warmth">Warmth</string>
+    <string name="hue">Hue</string>
+    <string name="tint">Tint</string>
     <string name="ambient_glow">Ambient glow</string>
+    <string name="reset">Reset</string>
+    <string name="close">Close</string>
+    <string name="track_off">Off</string>
+    <string name="aspect_fit">Fit to screen</string>
+    <string name="aspect_stretch">Stretch</string>
+    <string name="aspect_crop">Crop to fill</string>
     <string name="apply_enhance">Live enhance is on</string>
     <string name="enhance_off">Enhance off</string>
 
     <string name="settings_playback">Playback</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="theme_mode">App theme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_system">System</string>
+    <string name="seek_step">Double-tap seek step</string>
+    <string name="hold_speed_value">Hold-to-boost speed</string>
     <string name="settings_enhance">GlowEnhance</string>
     <string name="settings_gestures">Gestures</string>
     <string name="remember_position">Remember playback position</string>
@@ -66,7 +83,7 @@
     <string name="hardware_decoder">Prefer hardware decoder</string>
     <string name="pip_on_leave">Enter PiP when leaving player</string>
     <string name="about">About GlowPlay</string>
-    <string name="about_body">GlowPlay is a local-first Android video player with a live GPU enhance engine, ambient glow, and MX-style gestures — built to look like a night cinema, not a clone.</string>
+    <string name="about_body">GlowPlay is a local-first Android video player with a live GPU enhance engine (brightness, contrast, saturation, warmth, hue and tint), MX-style gestures and a premium light design.</string>
     <string name="version_fmt">Version %1$s (%2$d)</string>
 
     <string name="sort_date_new">Newest</string>

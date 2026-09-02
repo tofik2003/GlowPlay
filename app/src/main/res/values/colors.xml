@@ -8,4 +8,9 @@
     <color name="ic_launcher_background">#FF070B12</color>
     <color name="white">#FFFFFFFF</color>
     <color name="scrim">#CC05070C</color>
+
+    <!-- Premium light palette -->
+    <color name="porcelain">#FFFAF8F4</color>
+    <color name="ink">#FF1A1C22</color>
+    <color name="royal_violet">#FF5B4CDB</color>
 </resources>

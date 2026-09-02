@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.GlowPlay" parent="Theme.AppCompat.NoActionBar">
-        <item name="android:statusBarColor">@color/night</item>
-        <item name="android:navigationBarColor">@color/night</item>
-        <item name="android:windowBackground">@color/night</item>
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="colorPrimary">@color/glow_cyan</item>
-        <item name="android:colorAccent">@color/glow_cyan</item>
+    <!-- GlowPlay defaults to its premium light theme; in-app the user can
+         switch to Dark or follow the system. Keep the window light so the
+         launch matches the default theme without a flash. -->
+    <style name="Theme.GlowPlay" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/porcelain</item>
+        <item name="android:navigationBarColor">@color/porcelain</item>
+        <item name="android:windowBackground">@color/porcelain</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="colorPrimary">@color/royal_violet</item>
+        <item name="android:colorAccent">@color/royal_violet</item>
     </style>
 </resources>

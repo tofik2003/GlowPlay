@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.ui.PlayerView
+import com.glowplay.player.data.local.ThemeMode
 import com.glowplay.player.ui.player.PlayerScreen
 import com.glowplay.player.ui.player.PlayerViewModel
 import com.glowplay.player.ui.player.rotateActivity
@@ -32,7 +33,7 @@ class PlayerActivity : AppCompatActivity() {
         handleIntent(intent)
         setContent {
             val state by playerViewModel.state.collectAsStateWithLifecycle()
-            GlowPlayTheme {
+            GlowPlayTheme(themeMode = ThemeMode.DARK) {
                 PlayerScreen(
                     state = state,
                     playerViewFactory = {
@@ -54,12 +55,16 @@ class PlayerActivity : AppCompatActivity() {
                     onShowControls = playerViewModel::showControls,
                     onCycleAspect = { playerViewModel.cycleAspect() },
                     onSpeed = playerViewModel::setSpeed,
+                    onSpeedOpen = playerViewModel::setSpeedOpen,
                     onHoldBoost = playerViewModel::setHoldBoost,
                     onPreset = playerViewModel::setPreset,
                     onEnhance = playerViewModel::updateEnhance,
+                    onEnhanceReset = playerViewModel::resetEnhance,
                     onEnhanceOpen = playerViewModel::setEnhanceOpen,
                     onEqOpen = playerViewModel::setEqOpen,
                     onEqPreset = playerViewModel::applyEqPreset,
+                    onSelectAudio = playerViewModel::selectAudio,
+                    onSelectText = playerViewModel::selectText,
                     onPip = { enterPip() },
                     onRotate = { rotateActivity(this) },
                 )

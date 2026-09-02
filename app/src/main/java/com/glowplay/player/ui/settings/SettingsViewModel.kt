@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.glowplay.player.GlowPlayApp
 import com.glowplay.player.data.local.AppPreferences
+import com.glowplay.player.data.local.ThemeMode
 import com.glowplay.player.data.local.UserPreferences
 import com.glowplay.player.enhance.EnhancePreset
 import kotlinx.coroutines.flow.SharingStarted
@@ -31,6 +32,9 @@ class SettingsViewModel(
     fun setHardware(value: Boolean) = launch { prefs.setHardwareDecoder(value) }
     fun setPip(value: Boolean) = launch { prefs.setPipOnLeave(value) }
     fun setPreset(value: EnhancePreset) = launch { prefs.setPreset(value) }
+    fun setThemeMode(value: ThemeMode) = launch { prefs.setThemeMode(value) }
+    fun setSeekStep(value: Int) = launch { prefs.setSeekStepSeconds(value) }
+    fun setHoldSpeedValue(value: Float) = launch { prefs.setHoldSpeedValue(value) }
 
     private fun launch(block: suspend () -> Unit) {
         viewModelScope.launch { block() }

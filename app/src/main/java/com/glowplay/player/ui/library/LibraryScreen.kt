@@ -37,6 +37,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -74,11 +75,6 @@ import com.glowplay.player.enhance.VideoSort
 import com.glowplay.player.ui.components.GlowTitle
 import com.glowplay.player.ui.components.NeonCard
 import com.glowplay.player.ui.components.ResumeBar
-import com.glowplay.player.ui.theme.GlowCyan
-import com.glowplay.player.ui.theme.GlowMagenta
-import com.glowplay.player.ui.theme.Night
-import com.glowplay.player.ui.theme.TextPrimary
-import com.glowplay.player.ui.theme.TextSecondary
 import com.glowplay.player.util.FileSizeFormatter
 import com.glowplay.player.util.TimeFormatter
 
@@ -98,22 +94,22 @@ fun LibraryScreen(
     var sortMenu by remember { mutableStateOf(false) }
 
     Scaffold(
-        containerColor = Night,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Night)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(horizontal = 20.dp, vertical = 12.dp),
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         GlowTitle(text = stringResource(R.string.app_name))
-                        Text(stringResource(R.string.app_tagline), color = TextSecondary)
+                        Text(stringResource(R.string.app_tagline), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Box {
                         IconButton(onClick = { sortMenu = true }) {
-                            Icon(Icons.Outlined.Sort, contentDescription = stringResource(R.string.sort), tint = GlowCyan)
+                            Icon(Icons.Outlined.Sort, contentDescription = stringResource(R.string.sort), tint = MaterialTheme.colorScheme.primary)
                         }
                         DropdownMenu(expanded = sortMenu, onDismissRequest = { sortMenu = false }) {
                             VideoSort.entries.forEach { option ->
@@ -128,7 +124,7 @@ fun LibraryScreen(
                         }
                     }
                     IconButton(onClick = onOpenSettings) {
-                        Icon(Icons.Outlined.Settings, contentDescription = stringResource(R.string.settings), tint = GlowCyan)
+                        Icon(Icons.Outlined.Settings, contentDescription = stringResource(R.string.settings), tint = MaterialTheme.colorScheme.primary)
                     }
                 }
                 OutlinedTextField(
@@ -137,15 +133,15 @@ fun LibraryScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 12.dp),
-                    leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null, tint = GlowCyan) },
+                    leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                     placeholder = { Text(stringResource(R.string.search_videos)) },
                     singleLine = true,
                     shape = RoundedCornerShape(18.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = GlowCyan,
-                        unfocusedBorderColor = GlowCyan.copy(alpha = 0.25f),
-                        focusedTextColor = TextPrimary,
-                        unfocusedTextColor = TextPrimary,
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.25f),
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                     ),
                 )
             }
@@ -162,12 +158,12 @@ fun LibraryScreen(
             }
             TabRow(
                 selectedTabIndex = tab,
-                containerColor = Night,
-                contentColor = GlowCyan,
+                containerColor = MaterialTheme.colorScheme.background,
+                contentColor = MaterialTheme.colorScheme.primary,
                 indicator = { positions ->
                     TabRowDefaults.SecondaryIndicator(
                         modifier = Modifier.tabIndicatorOffset(positions[tab]),
-                        color = GlowCyan,
+                        color = MaterialTheme.colorScheme.primary,
                     )
                 },
             ) {
@@ -185,7 +181,7 @@ fun LibraryScreen(
             }
             when {
                 state.loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = GlowCyan)
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 }
                 tab == 0 -> VideoGrid(state.videos, state, onOpenVideo)
                 tab == 1 -> FolderList(state.folders, onOpenFolder)
@@ -235,7 +231,7 @@ private fun FolderList(folders: List<FolderItem>, onOpenFolder: (FolderItem) -> 
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onOpenFolder(folder) },
-                glow = GlowMagenta,
+                glow = MaterialTheme.colorScheme.secondary,
             ) {
                 Row(
                     modifier = Modifier.padding(14.dp),
@@ -244,14 +240,14 @@ private fun FolderList(folders: List<FolderItem>, onOpenFolder: (FolderItem) -> 
                     Icon(
                         Icons.Outlined.Folder,
                         contentDescription = null,
-                        tint = GlowCyan,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(32.dp),
                     )
                     Column(Modifier.padding(start = 12.dp).weight(1f)) {
-                        Text(folder.name, color = TextPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(folder.name, color = MaterialTheme.colorScheme.onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Text(
                             "${folder.videoCount} • ${TimeFormatter.formatMs(folder.totalDurationMs)}",
-                            color = TextSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
@@ -334,7 +330,7 @@ private fun VideoCard(
                 Icon(
                     Icons.Outlined.PlayArrow,
                     contentDescription = stringResource(R.string.play),
-                    tint = GlowCyan,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .align(Alignment.Center)
                         .size(36.dp)
@@ -353,14 +349,14 @@ private fun VideoCard(
             }
             Text(
                 text = video.name,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
             )
             Text(
                 text = "${video.folderName.ifBlank { stringResource(R.string.unknown_folder) }} • ${FileSizeFormatter.format(video.sizeBytes)}",
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
@@ -379,7 +375,7 @@ private fun PermissionPane(onRequestPermission: () -> Unit) {
                 GlowTitle(stringResource(R.string.permission_title))
                 Text(
                     stringResource(R.string.permission_body),
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 10.dp, bottom = 18.dp),
                 )
                 Button(onClick = onRequestPermission) { Text(stringResource(R.string.grant_permission)) }
@@ -401,7 +397,7 @@ private fun PermissionPane(onRequestPermission: () -> Unit) {
 @Composable
 private fun EmptyPane(message: String) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(message, color = TextSecondary, modifier = Modifier.padding(24.dp))
+        Text(message, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(24.dp))
     }
 }
 
@@ -425,16 +421,16 @@ fun FolderDetailScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Night),
+            .background(MaterialTheme.colorScheme.background),
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            TextButton(onClick = onBack) { Text("Back", color = GlowCyan) }
+            TextButton(onClick = onBack) { Text("Back", color = MaterialTheme.colorScheme.primary) }
             Column {
                 GlowTitle(folder.name)
-                Text("${items.size} videos", color = TextSecondary)
+                Text("${items.size} videos", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
         VideoGrid(items, LibraryUiState(videos = items), onOpenVideo)

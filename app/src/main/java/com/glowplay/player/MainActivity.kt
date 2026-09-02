@@ -10,6 +10,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.glowplay.player.data.local.AppPreferences
 import com.glowplay.player.ui.navigation.GlowPlayNav
 import com.glowplay.player.ui.theme.GlowPlayTheme
 import com.glowplay.player.util.MediaPermissions
@@ -28,8 +30,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         granted = hasMediaPermission()
+        val app = application as GlowPlayApp
         setContent {
-            GlowPlayTheme {
+            val prefs by app.prefs.flow.collectAsStateWithLifecycle(initialValue = AppPreferences())
+            GlowPlayTheme(themeMode = prefs.themeMode) {
                 GlowPlayNav(
                     permissionGranted = granted,
                     onRequestPermission = {
