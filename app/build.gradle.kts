@@ -74,7 +74,6 @@ android {
         warningsAsErrors = false
         checkReleaseBuilds = true
         textReport = true
-        textOutput = file("stdout")
         disable += setOf(
             "UnusedResources",
             "VectorPath",
@@ -131,4 +130,25 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.truth)
     testImplementation(libs.kotlinx.coroutines.test)
+}
+
+// Prints the full lint text report to the console (useful in CI logs), even
+// when lintDebug fails the build.
+val printLintResults = tasks.register("printLintResults") {
+    doLast {
+        val report = layout.buildDirectory
+            .file("intermediates/lint_intermediate_text_report/debug/lintReportDebug/lint-results-debug.txt")
+            .get().asFile
+        if (report.exists()) {
+            println("========== LINT TEXT REPORT ==========")
+            println(report.readText())
+            println("========== END LINT REPORT ==========")
+        }
+    }
+}
+
+tasks.configureEach {
+    if (name == "lintDebug") {
+        finalizedBy(printLintResults)
+    }
 }
