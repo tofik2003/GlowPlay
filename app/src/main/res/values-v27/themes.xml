@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- API 27+: draw into the display cutout while in the player. -->
+    <style name="Theme.GlowPlay.Player" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:statusBarColor">@color/night</item>
+        <item name="android:navigationBarColor">@color/night</item>
+        <item name="android:windowBackground">@color/night</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="colorPrimary">@color/glow_cyan</item>
+        <item name="android:colorAccent">@color/glow_cyan</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    </style>
+</resources>

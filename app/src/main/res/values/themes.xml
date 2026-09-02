@@ -18,7 +18,6 @@
         <item name="colorPrimary">@color/glow_cyan</item>
         <item name="android:colorAccent">@color/glow_cyan</item>
         <item name="android:windowFullscreen">false</item>
-        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
     </style>
 
     <style name="Theme.GlowPlay.Splash" parent="Theme.SplashScreen">

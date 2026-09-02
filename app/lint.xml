@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
+    <issue id="UnsafeOptInUsageError">
+        <option name="opt-in" value="androidx.media3.common.util.UnstableApi" />
+    </issue>
     <issue id="UnusedResources" severity="ignore" />
     <issue id="ContentDescription" severity="warning" />
     <issue id="MissingTranslation" severity="ignore" />

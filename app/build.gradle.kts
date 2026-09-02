@@ -50,7 +50,6 @@ android {
     kotlinOptions {
         jvmTarget = "17"
         freeCompilerArgs += listOf(
-            "-opt-in=androidx.media3.common.util.UnstableApi",
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-Xjvm-default=all",
         )
