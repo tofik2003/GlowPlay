@@ -57,6 +57,14 @@ object GlowPlayerFactory {
                     .setGreenScale(1f)
                     .setBlueScale(GlowEffects.blueScale(command.value))
                     .build()
+                GlowEffectCommand.Type.HUE -> HslAdjustment.Builder()
+                    .adjustHue(GlowEffects.hueDegrees(command.value))
+                    .build()
+                GlowEffectCommand.Type.TINT -> RgbAdjustment.Builder()
+                    .setRedScale(GlowEffects.tintRedBlueScale(command.value))
+                    .setGreenScale(GlowEffects.tintGreenScale(command.value))
+                    .setBlueScale(GlowEffects.tintRedBlueScale(command.value))
+                    .build()
             }
         }
     }

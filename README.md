@@ -1,12 +1,17 @@
-# GlowPlay
+# GlowPlay 2.0
 
-Neon Android video player with **live GlowEnhance** — color grading on the GPU while the video plays.
+Premium Android video player with **live GlowEnhance** — color grading on the GPU while the video plays.
 
-MX-style library and gestures, not an MX clone: cyan/magenta cinema UI, enhance presets, ambient glow, hold-to-2×, continue-watching.
+**What's new in 2.0**
+
+- **Premium light design** (ivory / royal violet / gold) as the default, with Dark and System theme options in Settings.
+- **Enhance engine rebuilt** — the GPU effect pipeline is now always initialised before playback, so presets and sliders apply *live*, mid-playback, every time. New **Hue** and **Tint** controls, new **Sunset** and **Mono** presets, per-slider value readouts and one-tap Reset.
+- **MX-style player controls** — on-screen volume/brightness HUDs with percentage, horizontal swipe-to-seek with time preview, double-tap ±seek flash, aspect-ratio label toast (Fit / Stretch / Crop), clock in the top bar, a 0.25×–4.0× speed sheet, and working audio/subtitle track selection.
+- **Redesigned settings** — grouped cards (Appearance, Playback, Gestures, GlowEnhance, About) with double-tap seek step and hold-to-boost speed options.
 
 ## Is real-time enhance possible?
 
-Yes. GlowPlay uses [Media3 / ExoPlayer `setVideoEffects`](https://developer.android.com/media/media3/exoplayer) so brightness, contrast, saturation, and warmth are applied to decoded frames on the GPU. The file on disk is never rewritten.
+Yes. GlowPlay uses [Media3 / ExoPlayer `setVideoEffects`](https://developer.android.com/media/media3/exoplayer) so brightness, contrast, saturation, warmth, hue and tint are applied to decoded frames on the GPU. The file on disk is never rewritten.
 
 ## Build with GitHub Actions
 

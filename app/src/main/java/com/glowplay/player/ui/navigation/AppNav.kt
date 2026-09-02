@@ -101,6 +101,9 @@ fun GlowPlayNav(
                 onHardware = settingsVm::setHardware,
                 onPip = settingsVm::setPip,
                 onPreset = settingsVm::setPreset,
+                onThemeMode = settingsVm::setThemeMode,
+                onSeekStep = settingsVm::setSeekStep,
+                onHoldSpeedValue = settingsVm::setHoldSpeedValue,
             )
         }
     }

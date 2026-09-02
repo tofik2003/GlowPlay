@@ -12,8 +12,8 @@ android {
         applicationId = "com.glowplay.player"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "2.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -50,7 +50,6 @@ android {
     kotlinOptions {
         jvmTarget = "17"
         freeCompilerArgs += listOf(
-            "-opt-in=androidx.media3.common.util.UnstableApi",
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-Xjvm-default=all",
         )
@@ -73,6 +72,7 @@ android {
         abortOnError = true
         warningsAsErrors = false
         checkReleaseBuilds = true
+        textReport = true
         disable += setOf(
             "UnusedResources",
             "VectorPath",
@@ -129,4 +129,25 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.truth)
     testImplementation(libs.kotlinx.coroutines.test)
+}
+
+// Prints the full lint text report to the console (useful in CI logs), even
+// when lintDebug fails the build.
+val printLintResults = tasks.register("printLintResults") {
+    doLast {
+        val report = layout.buildDirectory
+            .file("intermediates/lint_intermediate_text_report/debug/lintReportDebug/lint-results-debug.txt")
+            .get().asFile
+        if (report.exists()) {
+            println("========== LINT TEXT REPORT ==========")
+            println(report.readText())
+            println("========== END LINT REPORT ==========")
+        }
+    }
+}
+
+tasks.configureEach {
+    if (name == "lintDebug") {
+        finalizedBy(printLintResults)
+    }
 }

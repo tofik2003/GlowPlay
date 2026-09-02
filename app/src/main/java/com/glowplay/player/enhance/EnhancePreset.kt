@@ -11,6 +11,8 @@ enum class EnhancePreset(val storageKey: String) {
     CRYSTAL("crystal"),
     WARM("warm"),
     COOL("cool"),
+    SUNSET("sunset"),
+    MONO("mono"),
     CUSTOM("custom");
 
     fun settingsOr(custom: EnhanceSettings): EnhanceSettings = when (this) {
@@ -28,6 +30,7 @@ enum class EnhancePreset(val storageKey: String) {
             contrast = 0.20f,
             saturation = 0.08f,
             warmth = 0.14f,
+            tint = 0.05f,
             glow = 0.40f,
             enabled = true,
         )
@@ -69,6 +72,24 @@ enum class EnhancePreset(val storageKey: String) {
             saturation = 0.10f,
             warmth = -0.32f,
             glow = 0.60f,
+            enabled = true,
+        )
+        SUNSET -> EnhanceSettings(
+            brightness = 0.02f,
+            contrast = 0.12f,
+            saturation = 0.20f,
+            warmth = 0.30f,
+            hue = -0.08f,
+            tint = 0.10f,
+            glow = 0.65f,
+            enabled = true,
+        )
+        MONO -> EnhanceSettings(
+            brightness = 0.02f,
+            contrast = 0.22f,
+            saturation = -0.95f,
+            warmth = 0.00f,
+            glow = 0.25f,
             enabled = true,
         )
         CUSTOM -> custom.clamped().copy(enabled = true)

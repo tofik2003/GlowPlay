@@ -5,6 +5,8 @@ data class EnhanceSettings(
     val contrast: Float = 0f,
     val saturation: Float = 0f,
     val warmth: Float = 0f,
+    val hue: Float = 0f,
+    val tint: Float = 0f,
     val glow: Float = 0.45f,
     val enabled: Boolean = false,
 ) {
@@ -13,6 +15,8 @@ data class EnhanceSettings(
         contrast = contrast.coerceIn(RANGE),
         saturation = saturation.coerceIn(RANGE),
         warmth = warmth.coerceIn(RANGE),
+        hue = hue.coerceIn(RANGE),
+        tint = tint.coerceIn(RANGE),
         glow = glow.coerceIn(0f, 1f),
     )
 
