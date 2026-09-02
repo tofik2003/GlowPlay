@@ -27,6 +27,16 @@ enum class ThemeMode(val storageKey: String) {
     }
 }
 
+enum class LibraryViewMode(val storageKey: String) {
+    GRID("grid"),
+    LIST("list");
+
+    companion object {
+        fun fromKey(key: String?): LibraryViewMode =
+            entries.firstOrNull { it.storageKey == key } ?: GRID
+    }
+}
+
 data class AppPreferences(
     val rememberPosition: Boolean = true,
     val autoplayNext: Boolean = true,
@@ -40,6 +50,8 @@ data class AppPreferences(
     val themeMode: ThemeMode = ThemeMode.LIGHT,
     val seekStepSeconds: Int = 10,
     val holdSpeedValue: Float = 2f,
+    val viewMode: LibraryViewMode = LibraryViewMode.GRID,
+    val subtitleScale: Float = 1f,
 )
 
 class UserPreferences(context: Context) {
@@ -64,6 +76,14 @@ class UserPreferences(context: Context) {
 
     suspend fun setHoldSpeedValue(speed: Float) {
         dataStore.edit { it[Keys.holdSpeedValue] = speed.coerceIn(1.25f, 4f) }
+    }
+
+    suspend fun setViewMode(mode: LibraryViewMode) {
+        dataStore.edit { it[Keys.viewMode] = mode.storageKey }
+    }
+
+    suspend fun setSubtitleScale(scale: Float) {
+        dataStore.edit { it[Keys.subtitleScale] = scale.coerceIn(0.6f, 1.8f) }
     }
 
     suspend fun setPreset(preset: EnhancePreset) {
@@ -133,6 +153,8 @@ class UserPreferences(context: Context) {
             themeMode = ThemeMode.fromKey(this[Keys.theme]),
             seekStepSeconds = (this[Keys.seekStep] ?: 10).coerceIn(5, 60),
             holdSpeedValue = (this[Keys.holdSpeedValue] ?: 2f).coerceIn(1.25f, 4f),
+            viewMode = LibraryViewMode.fromKey(this[Keys.viewMode]),
+            subtitleScale = (this[Keys.subtitleScale] ?: 1f).coerceIn(0.6f, 1.8f),
         )
     }
 
@@ -149,5 +171,7 @@ class UserPreferences(context: Context) {
         val theme = stringPreferencesKey("theme_mode")
         val seekStep = intPreferencesKey("seek_step_seconds")
         val holdSpeedValue = floatPreferencesKey("hold_speed_value")
+        val viewMode = stringPreferencesKey("view_mode")
+        val subtitleScale = floatPreferencesKey("subtitle_scale")
     }
 }

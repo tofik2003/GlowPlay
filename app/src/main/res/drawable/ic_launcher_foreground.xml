@@ -4,20 +4,35 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- Soft aurora halo -->
     <path
-        android:fillColor="#1A00F0FF"
-        android:pathData="M54,54m-30,0a30,30 0,1 1,60 0a30,30 0,1 1,-60 0" />
+        android:fillColor="#2622E1F2"
+        android:pathData="M54,54m-32,0a32,32 0,1 1,64 0a32,32 0,1 1,-64 0" />
+    <!-- Outer ring: cyan → magenta gradient approximated with two arcs -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M54,22 A32,32 0,1 1,53.9 22"
+        android:strokeWidth="2.6"
+        android:strokeColor="#22E1F2"
+        android:strokeLineCap="round" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M54,86 A32,32 0,0 1,54.1 86"
+        android:strokeWidth="2.6"
+        android:strokeColor="#FF4FD8"
+        android:strokeLineCap="round" />
+    <!-- Inner hairline ring -->
     <path
         android:fillColor="#00000000"
         android:pathData="M54,54m-24,0a24,24 0,1 1,48 0a24,24 0,1 1,-48 0"
-        android:strokeWidth="2.4"
-        android:strokeColor="#FF2BD6" />
-    <path
-        android:fillColor="#00000000"
-        android:pathData="M54,54m-20.5,0a20.5,20.5 0,1 1,41 0a20.5,20.5 0,1 1,-41 0"
         android:strokeWidth="1.1"
-        android:strokeColor="#6600F0FF" />
+        android:strokeColor="#5522E1F2" />
+    <!-- Orbit accent dot -->
     <path
-        android:fillColor="#00F0FF"
-        android:pathData="M46.5,42.5 L46.5,65.5 L67.5,54 Z" />
+        android:fillColor="#FF4FD8"
+        android:pathData="M83,32m-3.4,0a3.4,3.4 0,1 1,6.8 0a3.4,3.4 0,1 1,-6.8 0" />
+    <!-- Play mark -->
+    <path
+        android:fillColor="#22E1F2"
+        android:pathData="M46,41.5 L46,66.5 L68.5,54 Z" />
 </vector>

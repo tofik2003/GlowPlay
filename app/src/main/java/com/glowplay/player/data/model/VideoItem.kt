@@ -27,3 +27,10 @@ data class RecentItem(
     val video: VideoItem,
     val positionMs: Long,
 )
+
+enum class DurationFilter(val minMs: Long, val maxMs: Long) {
+    ANY(0L, Long.MAX_VALUE),
+    SHORT(0L, 5 * 60_000L),
+    MEDIUM(5 * 60_000L, 30 * 60_000L),
+    LONG(30 * 60_000L, Long.MAX_VALUE),
+}

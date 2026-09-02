@@ -1,5 +1,6 @@
 package com.glowplay.player.enhance
 
+import com.glowplay.player.data.model.DurationFilter
 import com.glowplay.player.data.model.FolderItem
 import com.glowplay.player.data.model.RecentItem
 import com.glowplay.player.data.model.VideoItem
@@ -35,6 +36,16 @@ object VideoCatalog {
             video.name.contains(q, ignoreCase = true) ||
                 video.folderName.contains(q, ignoreCase = true)
         }
+    }
+
+    fun filterByDuration(videos: List<VideoItem>, filter: DurationFilter): List<VideoItem> {
+        if (filter == DurationFilter.ANY) return videos
+        return videos.filter { it.durationMs >= filter.minMs && it.durationMs < filter.maxMs }
+    }
+
+    fun favoritesOnly(videos: List<VideoItem>, favoriteKeys: Set<String>): List<VideoItem> {
+        if (favoriteKeys.isEmpty()) return emptyList()
+        return videos.filter { it.mediaKey in favoriteKeys }
     }
 
     fun sort(videos: List<VideoItem>, sort: VideoSort): List<VideoItem> = when (sort) {

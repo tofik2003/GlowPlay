@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -21,27 +22,30 @@ import androidx.compose.material.icons.outlined.Gesture
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.PlayCircleOutline
+import androidx.compose.material.icons.outlined.Subtitles
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.glowplay.player.BuildConfig
 import com.glowplay.player.R
 import com.glowplay.player.data.local.AppPreferences
 import com.glowplay.player.data.local.ThemeMode
 import com.glowplay.player.enhance.EnhancePreset
 import com.glowplay.player.ui.components.NeonCard
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -58,6 +62,7 @@ fun SettingsScreen(
     onThemeMode: (ThemeMode) -> Unit,
     onSeekStep: (Int) -> Unit,
     onHoldSpeedValue: (Float) -> Unit,
+    onSubtitleScale: (Float) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -82,18 +87,13 @@ fun SettingsScreen(
             Text(
                 text = stringResource(R.string.settings),
                 color = MaterialTheme.colorScheme.onBackground,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.headlineMedium,
             )
         }
 
         // ── Appearance ───────────────────────────────────────────────────────
         SettingsCard(icon = Icons.Outlined.Palette, title = stringResource(R.string.settings_appearance)) {
-            Text(
-                stringResource(R.string.theme_mode),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 13.sp,
-            )
+            SectionLabel(stringResource(R.string.theme_mode))
             Row(
                 modifier = Modifier.padding(top = 6.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -111,11 +111,7 @@ fun SettingsScreen(
             ToggleRow(stringResource(R.string.hardware_decoder), state.hardwareDecoder, onHardware)
             ToggleRow(stringResource(R.string.pip_on_leave), state.pipOnLeave, onPip)
             Spacer(Modifier.height(6.dp))
-            Text(
-                stringResource(R.string.seek_step),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 13.sp,
-            )
+            SectionLabel(stringResource(R.string.seek_step))
             Row(
                 modifier = Modifier.padding(top = 6.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -131,11 +127,7 @@ fun SettingsScreen(
             ToggleRow(stringResource(R.string.enable_gestures), state.gesturesEnabled, onGestures)
             ToggleRow(stringResource(R.string.long_press_speed), state.longPressSpeed, onHoldSpeed)
             Spacer(Modifier.height(6.dp))
-            Text(
-                stringResource(R.string.hold_speed_value),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 13.sp,
-            )
+            SectionLabel(stringResource(R.string.hold_speed_value))
             Row(
                 modifier = Modifier.padding(top = 6.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -148,11 +140,7 @@ fun SettingsScreen(
 
         // ── GlowEnhance ──────────────────────────────────────────────────────
         SettingsCard(icon = Icons.Outlined.AutoAwesome, title = stringResource(R.string.settings_enhance)) {
-            Text(
-                stringResource(R.string.default_preset),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 13.sp,
-            )
+            SectionLabel(stringResource(R.string.default_preset))
             FlowRow(
                 modifier = Modifier.padding(top = 6.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -163,21 +151,53 @@ fun SettingsScreen(
             }
         }
 
+        // ── Subtitles ────────────────────────────────────────────────────────
+        SettingsCard(icon = Icons.Outlined.Subtitles, title = stringResource(R.string.settings_subtitles)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                SectionLabel(stringResource(R.string.subtitle_size))
+                Spacer(Modifier.weight(1f))
+                Text(
+                    "${(state.subtitleScale * 100).roundToInt()}%",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
+            Slider(
+                value = state.subtitleScale,
+                onValueChange = { onSubtitleScale((it * 20).roundToInt() / 20f) },
+                valueRange = 0.6f..1.8f,
+                colors = SliderDefaults.colors(
+                    thumbColor = MaterialTheme.colorScheme.primary,
+                    activeTrackColor = MaterialTheme.colorScheme.primary,
+                ),
+            )
+        }
+
         // ── About ────────────────────────────────────────────────────────────
         SettingsCard(icon = Icons.Outlined.Info, title = stringResource(R.string.about)) {
             Text(
                 stringResource(R.string.about_body),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
             )
             Text(
                 stringResource(R.string.version_fmt, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 12.sp,
+                style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(top = 10.dp),
             )
         }
         Spacer(Modifier.height(24.dp))
     }
+}
+
+@Composable
+private fun SectionLabel(text: String) {
+    Text(
+        text,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = MaterialTheme.typography.labelLarge,
+    )
 }
 
 @Composable
@@ -193,21 +213,28 @@ private fun SettingsCard(
     ) {
         Column(Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    icon,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp),
-                )
+                androidx.compose.foundation.layout.Box(
+                    modifier = Modifier
+                        .size(34.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(MaterialTheme.colorScheme.primaryContainer),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        icon,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
                 Text(
                     text = title,
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(start = 8.dp),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(start = 10.dp),
                 )
             }
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(12.dp))
             content()
         }
     }
@@ -233,6 +260,7 @@ private fun ToggleRow(label: String, checked: Boolean, onChange: (Boolean) -> Un
         Text(
             label,
             color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.weight(1f),
         )
         Switch(

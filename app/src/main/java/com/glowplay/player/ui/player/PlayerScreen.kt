@@ -115,6 +115,7 @@ private data class GestureHud(
 private data class TapFlash(val forward: Boolean, val seconds: Int, val id: Long)
 
 @OptIn(ExperimentalMaterial3Api::class)
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
 fun PlayerScreen(
     state: PlayerUiState,
@@ -313,6 +314,9 @@ fun PlayerScreen(
                 update = { view ->
                     view.resizeMode = resizeMode
                     view.useController = false
+                    view.subtitleView?.setFractionalTextSize(
+                        androidx.media3.ui.SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * state.preferences.subtitleScale,
+                    )
                 },
                 modifier = Modifier.fillMaxSize(),
             )
@@ -751,11 +755,20 @@ private fun PanelSurface(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp))
+            .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
             .background(Color(0xF20B111A))
-            .padding(16.dp),
-        content = content,
-    )
+            .padding(top = 10.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(bottom = 12.dp)
+                .size(width = 36.dp, height = 4.dp)
+                .clip(RoundedCornerShape(99.dp))
+                .background(Color.White.copy(alpha = 0.18f)),
+        )
+        content()
+    }
 }
 
 @Composable
@@ -781,13 +794,24 @@ private fun EnhancePanel(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             EnhancePreset.entries.filter { it != EnhancePreset.CUSTOM }.forEach { preset ->
+                val swatch = com.glowplay.player.enhance.PresetSwatches.colorFor(preset)
                 FilterChip(
                     selected = state.preset == preset,
                     onClick = { onPreset(preset) },
                     label = { Text(presetLabel(preset)) },
+                    leadingIcon = {
+                        Box(
+                            modifier = Modifier
+                                .size(10.dp)
+                                .clip(CircleShape)
+                                .background(swatch),
+                        )
+                    },
                     colors = FilterChipDefaults.filterChipColors(
                         labelColor = TextSecondary,
+                        iconColor = TextSecondary,
                         selectedLabelColor = Night,
+                        selectedLeadingIconColor = Night,
                         selectedContainerColor = GlowCyan,
                     ),
                 )
