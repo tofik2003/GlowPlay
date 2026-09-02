@@ -35,6 +35,7 @@ class SettingsViewModel(
     fun setThemeMode(value: ThemeMode) = launch { prefs.setThemeMode(value) }
     fun setSeekStep(value: Int) = launch { prefs.setSeekStepSeconds(value) }
     fun setHoldSpeedValue(value: Float) = launch { prefs.setHoldSpeedValue(value) }
+    fun setSubtitleScale(value: Float) = launch { prefs.setSubtitleScale(value) }
 
     private fun launch(block: suspend () -> Unit) {
         viewModelScope.launch { block() }

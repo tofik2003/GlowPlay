@@ -1,5 +1,6 @@
 package com.glowplay.player
 
+import com.glowplay.player.data.model.DurationFilter
 import com.glowplay.player.data.model.VideoItem
 import com.glowplay.player.enhance.VideoCatalog
 import com.glowplay.player.enhance.VideoSort
@@ -53,5 +54,27 @@ class VideoCatalogTest {
         assertEquals("content://1", playlist.first())
         assertTrue(playlist.contains("content://2"))
         assertEquals(2, playlist.size)
+    }
+
+    @Test
+    fun durationFilterBucketsCorrectly() {
+        val feature = VideoItem(4, "content://4", "Epic.mp4", 40 * 60_000L, 400, 1920, 1080, 50, 10, "Movies")
+        val all = listOf(movies, older, clip, feature)
+
+        val short = VideoCatalog.filterByDuration(all, DurationFilter.SHORT)
+        assertEquals(setOf(movies, older, clip), short.toSet())
+
+        val long = VideoCatalog.filterByDuration(all, DurationFilter.LONG)
+        assertEquals(listOf(feature), long)
+
+        val any = VideoCatalog.filterByDuration(all, DurationFilter.ANY)
+        assertEquals(4, any.size)
+    }
+
+    @Test
+    fun favoritesOnlyKeepsMatchingKeys() {
+        val favorites = VideoCatalog.favoritesOnly(listOf(movies, older, clip), setOf(clip.mediaKey))
+        assertEquals(listOf(clip), favorites)
+        assertTrue(VideoCatalog.favoritesOnly(listOf(movies), emptySet()).isEmpty())
     }
 }

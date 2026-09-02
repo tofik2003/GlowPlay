@@ -43,6 +43,9 @@ fun GlowPlayNav(
                 onRequestPermission = onRequestPermission,
                 onQuery = libraryVm::onQuery,
                 onSort = libraryVm::onSort,
+                onDurationFilter = libraryVm::onDurationFilter,
+                onViewMode = libraryVm::onViewMode,
+                onToggleFavorite = libraryVm::onToggleFavorite,
                 onOpenSettings = { nav.navigate(Routes.Settings) },
                 onOpenVideo = { video, playlist ->
                     context.startActivity(
@@ -74,6 +77,8 @@ fun GlowPlayNav(
             FolderDetailScreen(
                 folder = folder,
                 videos = libraryState.videos,
+                favoriteKeys = libraryState.favoriteKeys,
+                viewMode = libraryState.preferences.viewMode,
                 onBack = { nav.popBackStack() },
                 onOpenVideo = { video, playlist ->
                     context.startActivity(
@@ -86,6 +91,7 @@ fun GlowPlayNav(
                         ),
                     )
                 },
+                onToggleFavorite = libraryVm::onToggleFavorite,
             )
         }
         composable(Routes.Settings) {
@@ -104,6 +110,7 @@ fun GlowPlayNav(
                 onThemeMode = settingsVm::setThemeMode,
                 onSeekStep = settingsVm::setSeekStep,
                 onHoldSpeedValue = settingsVm::setHoldSpeedValue,
+                onSubtitleScale = settingsVm::setSubtitleScale,
             )
         }
     }

@@ -5,7 +5,15 @@
 
     <string name="tab_videos">Videos</string>
     <string name="tab_folders">Folders</string>
+    <string name="tab_favorites">Favorites</string>
     <string name="tab_recent">Continue</string>
+    <string name="toggle_view">Toggle grid / list view</string>
+    <string name="favorite">Favorite</string>
+    <string name="empty_favorites">No favorites yet. Tap the heart on any video to save it here.</string>
+    <string name="duration_any">Any length</string>
+    <string name="duration_short">Under 5 min</string>
+    <string name="duration_medium">5–30 min</string>
+    <string name="duration_long">Over 30 min</string>
 
     <string name="search_videos">Search videos</string>
     <string name="settings">Settings</string>
@@ -75,6 +83,8 @@
     <string name="hold_speed_value">Hold-to-boost speed</string>
     <string name="settings_enhance">GlowEnhance</string>
     <string name="settings_gestures">Gestures</string>
+    <string name="settings_subtitles">Subtitles</string>
+    <string name="subtitle_size">Subtitle size</string>
     <string name="remember_position">Remember playback position</string>
     <string name="autoplay_next">Autoplay next in folder</string>
     <string name="default_preset">Default enhance preset</string>
