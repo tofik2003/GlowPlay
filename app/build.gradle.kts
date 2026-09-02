@@ -73,6 +73,8 @@ android {
         abortOnError = true
         warningsAsErrors = false
         checkReleaseBuilds = true
+        textReport = true
+        textOutput = file("stdout")
         disable += setOf(
             "UnusedResources",
             "VectorPath",
