@@ -102,8 +102,9 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun handleIntent(intent: Intent?) {
-        val uri = intent?.data
-            ?: intent?.getStringExtra(EXTRA_URI)?.let(Uri::parse)
+        if (intent == null) return
+        val uri = intent.data
+            ?: intent.getStringExtra(EXTRA_URI)?.let(Uri::parse)
             ?: return
         val title = intent.getStringExtra(EXTRA_TITLE).orEmpty().ifBlank { uri.lastPathSegment.orEmpty() }
         val key = intent.getStringExtra(EXTRA_KEY).orEmpty().ifBlank { uri.toString() }
