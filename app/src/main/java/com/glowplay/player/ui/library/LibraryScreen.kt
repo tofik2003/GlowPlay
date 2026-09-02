@@ -510,10 +510,10 @@ private fun VideoCard(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.padding(horizontal = 10.dp, top = 8.dp),
+                modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 8.dp),
             )
             Row(
-                modifier = Modifier.padding(horizontal = 10.dp, top = 3.dp, bottom = 10.dp),
+                modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 3.dp, bottom = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
